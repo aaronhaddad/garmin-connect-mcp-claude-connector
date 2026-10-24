@@ -46,7 +46,7 @@ Dates can be `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`.
 
 | Tool | What it gives Claude |
 |---|---|
-| `garmin_list_activities` | Your activities with distance, time, pace and heart rate. Filter by date and type |
+| `garmin_list_activities` | Your activities with distance, time, pace, heart rate, training effect and Garmin's training load. Filter by date and type |
 | `garmin_get_activity_splits` | Downloads the original `.FIT` file and computes **exact** km (or mile, or 400 m) splits, interpolated at each boundary with pauses removed, plus per-split HR, cadence and climb, device laps, and a pacing verdict (even, negative split, faded) |
 | `garmin_get_performance_metrics` | Your **VO2 max** as Garmin Connect shows it, every VO2 max reading in a window, and per-activity aerobic/anaerobic training effect, recovery time and performance condition, decoded from the activity files |
 | `garmin_get_activity` | Garmin's own summary for one activity |
@@ -70,7 +70,7 @@ Dates can be `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`.
 | Tool | Try asking |
 |---|---|
 | `garmin_get_profile` | "What are my heart-rate zones?" |
-| `garmin_list_activities` | "List my runs from the last two weeks." |
+| `garmin_list_activities` | "What was my training load this week, activity by activity?" |
 | `garmin_get_performance_metrics` | "What's my VO2 max, and how has it moved this month?" |
 | `garmin_get_activity` | "What was the training effect of my last ride?" |
 | `garmin_get_activity_splits` | "How was my pacing on yesterday's run? Did I fade?" |

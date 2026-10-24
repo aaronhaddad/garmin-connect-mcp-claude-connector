@@ -61,6 +61,8 @@ export const textResult = (text: string) => ({ content: [{ type: "text" as const
 const g = (o: Obj, k: string) => o[k];
 const n = (v: Json | undefined) => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
 const str = (v: Json | undefined) => (typeof v === "string" ? v : undefined);
+const round1 = (v: number | undefined) => (v === undefined ? undefined : Math.round(v * 10) / 10);
+const roundInt = (v: number | undefined) => (v === undefined ? undefined : Math.round(v));
 
 export interface ActivitySummary {
   activity_id: number | string;
@@ -77,6 +79,11 @@ export interface ActivitySummary {
   calories?: number;
   avg_cadence?: number;
   training_effect?: number;
+  anaerobic_training_effect?: number;
+  /** Garmin's label for the main benefit, e.g. "lactate threshold". */
+  training_effect_label?: string;
+  /** Garmin's per-activity training load (EPOC-based), as Garmin Connect shows it. */
+  training_load?: number;
 }
 
 export function summarizeActivity(raw: Json): ActivitySummary | undefined {
@@ -104,17 +111,22 @@ export function summarizeActivity(raw: Json): ActivitySummary | undefined {
     elevation_gain_m: n(g(summary, "elevationGain")),
     calories: n(g(summary, "calories")),
     avg_cadence: n(g(summary, "averageRunningCadenceInStepsPerMinute")) ?? n(g(summary, "averageRunCadence")),
-    training_effect: n(g(summary, "aerobicTrainingEffect")) ?? n(g(summary, "trainingEffect")),
+    training_effect: round1(n(g(summary, "aerobicTrainingEffect")) ?? n(g(summary, "trainingEffect"))),
+    anaerobic_training_effect: round1(n(g(summary, "anaerobicTrainingEffect"))),
+    training_effect_label: str(g(summary, "trainingEffectLabel"))?.toLowerCase().replace(/_/g, " "),
+    training_load: roundInt(n(g(summary, "activityTrainingLoad"))),
   };
 }
 
 export function activityLine(a: ActivitySummary): string {
   const bits = [
-    a.distance_km !== undefined ? `${a.distance_km} km` : undefined,
+    a.distance_km ? `${a.distance_km} km` : undefined,
     a.duration,
     a.avg_pace,
     a.avg_hr ? `avg HR ${a.avg_hr}` : undefined,
     a.elevation_gain_m ? `+${Math.round(a.elevation_gain_m)} m` : undefined,
+    a.training_effect !== undefined ? `TE ${a.training_effect}${a.training_effect_label ? ` (${a.training_effect_label})` : ""}` : undefined,
+    a.training_load !== undefined ? `load ${a.training_load}` : undefined,
   ].filter(Boolean);
   return `- **${a.name ?? "Untitled"}** (${a.type ?? "activity"}, ${a.start_local ?? "?"}) · id ${a.activity_id}\n  ${bits.join(" · ")}`;
 }

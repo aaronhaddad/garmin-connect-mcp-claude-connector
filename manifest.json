@@ -48,7 +48,7 @@
     },
     {
       "name": "garmin_list_activities",
-      "description": "List recorded activities (runs, gym sessions, rides…), newest first, with distance, time, pace and heart rate."
+      "description": "List recorded activities (runs, gym sessions, rides…), newest first, with distance, time, pace, heart rate, training effect and training load."
     },
     {
       "name": "garmin_get_activity",

@@ -52,7 +52,7 @@ export function registerTools(server: McpServer, client: GarminClient): void {
     "garmin_list_activities",
     {
       title: "List activities",
-      description: `List recorded activities (runs, gym sessions, rides…), newest first, with distance, time, pace and heart rate.
+      description: `List recorded activities (runs, gym sessions, rides…), newest first, with distance, time, pace, heart rate, training effect and Garmin's training load.
 
 Examples:
   - "my runs this month" -> start_date="2026-10-01", activity_type="running"
