@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: 2026-10-24_
+_Last updated: 2026-10-25_
 
 This policy covers **garmin-personal-api-mcp**, also distributed as the Claude Desktop extension **Personal Data for Garmin Connect** ("the software"). It is an independent open-source project, not made or endorsed by Garmin.
 
@@ -31,7 +31,7 @@ Activity `.FIT` files used for split analysis are decoded in memory and not kept
 
 ## Third parties
 
-- **Garmin** receives your API requests, as with any use of its Personal API. See Garmin's privacy policy.
+- **Garmin** receives your API requests, as with any use of its Personal API. See Garmin's privacy policy. Your use of the API, including your key, is governed by Garmin's Personal API Supplemental Terms and Terms of Use: the key is for your own use only and must not be shared.
 - **Your MCP client's provider** receives the data you ask it to retrieve, as described above.
 
 No other party receives anything from the software.

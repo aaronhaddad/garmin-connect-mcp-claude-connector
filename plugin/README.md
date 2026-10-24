@@ -39,6 +39,10 @@ Ask in plain language, for example:
 - **Where data goes:** the server sends your API key to Garmin (`personal.connectapi.garmin.com`) to get a 24-hour access token, then makes read-only GET requests there when Claude calls a tool. Results go only to your Claude session. Nothing is sent anywhere else; there's no analytics or telemetry.
 - **What's stored on your computer:** the access token in `~/.config/garmin-personal-api-mcp/token.json` (permissions 0600). If you use `setup`, the key goes in the macOS Keychain or in `~/.config/garmin/connect-personal-api-key` (0600). Activity files are decoded in memory and not kept, unless you ask Claude to save one to a folder.
 
+## Garmin's terms
+
+Creating a Personal API key means accepting Garmin's Personal API Supplemental Terms. They allow a key to be used only by you, with tools you develop or operate for your own use, and forbid sharing it. This plugin follows that: it runs on your computer with your own key and only ever sends the key to Garmin. **Never share your key or your Garmin login with anyone**, including reviewers or support; anyone who wants to try the plugin creates their own free Garmin account and key. The plugin only uses Garmin's official Personal API (no scraping), is read-only and is free. You can read the terms in Garmin Connect under Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Review Terms and Conditions.
+
 Full details: [Privacy Policy](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/blob/main/PRIVACY.md).
 
 This is an independent project, not made or endorsed by Garmin. "Garmin" and "Garmin Connect" are trademarks of Garmin Ltd.

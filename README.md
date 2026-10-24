@@ -11,7 +11,7 @@ Ask Claude about your own Garmin data: runs, VO2 max, sleep, HRV, Body Battery, 
 
 ![Claude Desktop answering "What's my VO2 max and how has it moved this month?" with Garmin's VO2 max readings from the extension](docs/vo2max-demo.gif)
 
-**Contents:** [Install](#install-in-claude-desktop) · [What you can ask](#what-you-can-ask) · [What it can't do](#what-it-cant-do) · [Your data](#your-data-and-your-key) · [Claude Code, Cursor and other apps](#claude-code-cursor-and-other-apps) · [Contributing](#contributing)
+**Contents:** [Install](#install-in-claude-desktop) · [What you can ask](#what-you-can-ask) · [What it can't do](#what-it-cant-do) · [Your data](#your-data-and-your-key) · [Garmin's terms](#garmins-terms) · [Claude Code, Cursor and other apps](#claude-code-cursor-and-other-apps) · [Contributing](#contributing)
 
 ## Install in Claude Desktop
 
@@ -111,6 +111,16 @@ These limits are Garmin's, not this extension's:
 - **To remove access**, uninstall the extension in Claude Desktop and delete the key in Garmin Connect under Settings → Personal API.
 
 This is an independent project, not made or endorsed by Garmin. "Garmin" and "Garmin Connect" are trademarks of Garmin Ltd.
+
+## Garmin's terms
+
+When you create a Personal API key, you accept Garmin's **Personal API Supplemental Terms** (Garmin Connect → Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Review Terms and Conditions), on top of the [Garmin Terms of Use](https://www.garmin.com/legal/terms-of-use/). This project is built to keep you within them:
+
+- **Your key is for your own use only.** Garmin's terms allow a key to be used only by you, with tools you develop or operate for your own use, and forbid sharing it with anyone. So this tool runs on your computer, uses only your own key, and never sends the key anywhere except Garmin. **Never give your key or your Garmin login to anyone else**, including friends, support channels or reviewers. Anyone who wants to try the tool creates their own free Garmin account and key.
+- **Only the official API.** Every request goes through the Personal API that Garmin provides for this purpose. There's no scraping and no unofficial login, which Garmin's Terms of Use forbid.
+- **Personal, non-commercial and read-only.** The tool is free, never writes to your account, and has no hosted or shared version.
+- **Rate limits.** Garmin may limit or block requests that are too frequent. Ask for the data you need rather than very long ranges over and over.
+- **Your responsibility.** You're the one bound by Garmin's terms, and breaking them can get your key revoked. Read them when you create the key; Garmin can change them, and the current version is on that page.
 
 ## Claude Code, Cursor and other apps
 

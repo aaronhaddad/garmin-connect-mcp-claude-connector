@@ -6,6 +6,10 @@ Thanks for helping. This is a small project, so the rules below are short, but t
 
 These come from Garmin's terms and from how the extension is reviewed. Pull requests that break them won't be merged.
 
+Garmin's **Personal API Supplemental Terms** (shown when a user creates a key: Garmin Connect → Settings → Personal API → Review Terms and Conditions) allow a key to be used only by its owner, with tools they develop or operate for their own use, and forbid sharing it. The [Garmin Terms of Use](https://www.garmin.com/legal/terms-of-use/) forbid scraping and sharing account credentials. Every rule below follows from that.
+
+- **Never share a key or a Garmin login,** in issues, pull requests, test fixtures, CI secrets or with reviewers. Use your own account to test; tests and the smoke test run against a fake API and need no key.
+
 - **Read-only.** The Personal API has no write endpoints, and this server must never call anything but GET.
 - **Local, one user, their own key.** No hosted, shared or multi-user version, and nothing that sends data anywhere except between Garmin and the user's own MCP app.
 - **No login scraping.** Metrics Garmin doesn't expose through the Personal API (training readiness, training status, race predictions) stay out, even if an unofficial route exists.
