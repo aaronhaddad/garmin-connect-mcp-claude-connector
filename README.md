@@ -18,7 +18,7 @@ The simplest route on macOS and Windows. No terminal, no Node install.
 
 1. Create a key: Garmin Connect → Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Create Key, and copy it.
 2. Download `garmin-personal-api-mcp-<version>.mcpb` from the releases page and double-click it (or drag it into Claude Desktop → Settings → Extensions).
-3. Paste the key when Claude Desktop asks for it, and enable the extension.
+3. Claude Desktop installs it switched off until it has a key. Open Settings → Extensions → Personal Data for Garmin Connect, paste the key, click Save and switch it on.
 
 When the key expires, open Settings → Extensions → Personal Data for Garmin Connect and paste a new one.
 

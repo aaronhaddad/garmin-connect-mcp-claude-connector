@@ -4,7 +4,7 @@
  */
 import { BASE_URL, PACKAGE_NAME, REQUEST_TIMEOUT_MS, VERSION } from "./constants.js";
 import { TokenManager } from "./auth.js";
-import { keyFixHint } from "./keystore.js";
+import { KEY_STOP_NOTE, keyFixHint } from "./keystore.js";
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 type Params = Record<string, string | number | boolean | undefined>;
@@ -26,7 +26,7 @@ function httpErrorMessage(status: number, path: string, detail?: string): string
       return `Garmin rejected the request for ${path} (HTTP 400). Check the dates are YYYY-MM-DD and the range is not too long.${detail ? ` Garmin said: ${detail.slice(0, 200)}` : ""}`;
     case 401:
     case 403:
-      return `Garmin rejected the Personal API key. It has probably expired or been deleted. Ask the user to ${keyFixHint()}.`;
+      return `Garmin rejected the Personal API key. It has probably expired or been deleted. Ask the user to ${keyFixHint()}. ${KEY_STOP_NOTE}`;
     case 404:
       return `Not found: ${path}. The ID may be wrong, or the Personal API does not expose this endpoint. Use garmin_list_activities to find valid activity IDs.`;
     case 429:

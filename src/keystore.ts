@@ -44,6 +44,9 @@ export function keyFixHint(): string {
     : "run `npx garmin-personal-api-mcp setup` in a terminal to add a new key";
 }
 
+/** Appended to key errors: without it the model goes looking for the data in a browser instead of telling the user. */
+export const KEY_STOP_NOTE = "Only the user can fix this: tell them, and don't try to get the data another way (such as a browser).";
+
 export const keychainAvailable = (): boolean =>
   process.platform === "darwin" && existsSync("/usr/bin/security");
 

@@ -17,6 +17,9 @@ describe("keyFixHint", () => {
     expect(keyFixHint()).toContain("connect.garmin.com/app/settings/personalApiToken");
     expect(new GarminApiError(403, "/x").message).not.toMatch(/setup/);
   });
+  it("tells the model to stop instead of finding another route to the data", () => {
+    expect(new GarminApiError(401, "/x").message).toMatch(/don't try to get the data another way/);
+  });
 });
 
 describe("keyExpiryNote", () => {

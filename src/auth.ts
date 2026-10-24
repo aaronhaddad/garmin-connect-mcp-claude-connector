@@ -15,7 +15,7 @@ import {
   TOKEN_REFRESH_WINDOW_MS,
   VERSION,
 } from "./constants.js";
-import { keyFixHint } from "./keystore.js";
+import { KEY_STOP_NOTE, keyFixHint } from "./keystore.js";
 
 export interface BearerToken {
   accessToken: string;
@@ -78,7 +78,7 @@ export async function exchangeKey(key: string, signal?: AbortSignal): Promise<Be
   }
   if (res.status === 401 || res.status === 403) {
     throw new GarminAuthError(
-      `Garmin rejected the Personal API key. It may be mistyped, expired or deleted. To fix it, ${keyFixHint()}.`,
+      `Garmin rejected the Personal API key. It may be mistyped, expired or deleted. To fix it, ${keyFixHint()}. ${KEY_STOP_NOTE}`,
       res.status,
     );
   }
