@@ -11,6 +11,14 @@ Ask Claude about your own Garmin data: runs, VO2 max, sleep, HRV, Body Battery, 
 
 ![Claude Desktop answering "What's my VO2 max and how has it moved this month?" with Garmin's VO2 max readings from the extension](docs/vo2max-demo.gif)
 
+| You use | Install with |
+|---|---|
+| **Claude Desktop** (chat) | The [Download button](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest/download/garmin-personal-api-mcp.mcpb) above, then [three steps](#install-in-claude-desktop) |
+| **Claude Code and Cowork** | `/plugin install garmin-personal-api-mcp --marketplace aaronhaddad/garmin-connect-mcp-claude-connector` ([details](#claude-code-cursor-and-other-apps)) |
+| **Any other MCP app** (Cursor and others) | `npx garmin-personal-api-mcp setup` ([details](#claude-code-cursor-and-other-apps)) |
+
+All three need a Garmin Personal API key, which you create in Garmin Connect under Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken).
+
 **Contents:** [Install](#install-in-claude-desktop) · [What you can ask](#what-you-can-ask) · [What it can't do](#what-it-cant-do) · [Your data](#your-data-and-your-key) · [Garmin's terms](#garmins-terms) · [Claude Code, Cursor and other apps](#claude-code-cursor-and-other-apps) · [Contributing](#contributing)
 
 ## Install in Claude Desktop
@@ -121,6 +129,15 @@ When you create a Personal API key, you accept Garmin's **Personal API Supplemen
 - **Personal, non-commercial and read-only.** The tool is free, never writes to your account, and has no hosted or shared version.
 - **Rate limits.** Garmin may limit or block requests that are too frequent. Ask for the data you need rather than very long ranges over and over.
 - **Your responsibility.** You're the one bound by Garmin's terms, and breaking them can get your key revoked. Read them when you create the key; Garmin can change them, and the current version is on that page.
+
+### Why it isn't in Claude's plugin directory
+
+You won't find this in the directory under Customize → Plugins in Claude, and that's deliberate. Listing there requires agreeing to Anthropic's Software Directory Terms and Policy, and two of the Policy's requirements can't be met without breaking Garmin's terms:
+
+- **A test account for reviewers.** The Policy asks for a working test account with sample data. Garmin's terms say a Personal API key is for its owner's use only and must never be shared, and Garmin's Terms of Use forbid sharing account logins.
+- **Owning every endpoint.** The Policy asks developers to own or control every API their software calls. This tool calls Garmin's API, which only Garmin controls.
+
+The Terms also make the developer personally liable to Anthropic for claims about the software, which is a lot to take on for a free side project. So it's distributed directly instead: the [Claude Desktop extension](#install-in-claude-desktop), the npm package and the plugin below all install from this repository and work the same way.
 
 ## Claude Code, Cursor and other apps
 
