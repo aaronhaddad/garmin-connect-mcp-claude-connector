@@ -8,7 +8,7 @@ MCP server for a user's own Garmin Connect data via Garmin's official **Personal
 - `npm run check`: type-check + vitest + end-to-end smoke test (`scripts/smoke.mjs` runs the built server against a fake Garmin API on localhost)
 - `npm run setup`: build, then run the interactive setup wizard
 - `npm run pack:mcpb`: build the Claude Desktop extension (`scripts/pack-mcpb.mjs` stages `dist/` with production-only deps, validates `manifest.json`, writes `garmin-personal-api-mcp-<version>.mcpb`)
-- `npm version patch && git push --follow-tags`: release. The `version` hook copies the version into `manifest.json`; the `v*` tag triggers `.github/workflows/release.yml`, which checks, packs and attaches the `.mcpb` to a GitHub Release (no npm publish yet)
+- `npm version patch && git push --follow-tags`: release. The `version` hook copies the version into `manifest.json`; the `v*` tag triggers `.github/workflows/release.yml`, which checks, packs, attaches the `.mcpb` to a GitHub Release and publishes to npm via trusted publishing (OIDC, no token; configured on npmjs.com for `release.yml`)
 - `npx @modelcontextprotocol/inspector node dist/index.js`: manual tool testing
 
 Run `npm run check` after every change.
@@ -39,10 +39,10 @@ Endpoint paths come from Garmin's Apache-2.0 client, github.com/garmin/connect-p
 - **stdout is the MCP protocol** in serve mode. Log only to stderr.
 - **Never log, print or put the key on a command line.** Use `maskKey()` for display.
 
-## Status (2026-10-24)
+## Status (2026-10-25)
 
-- Built, unit tested and smoke tested. Repo: github.com/aaronhaddad/garmin-connect-mcp-claude-connector (private). npm package name stays `garmin-personal-api-mcp`
-- MCPB prep (steps 2–8 below) done and the packed bundle runs; not yet installed in Claude Desktop
+- Built, unit tested and smoke tested. Repo: github.com/aaronhaddad/garmin-connect-mcp-claude-connector (public since 2026-10-25). Released as v1.0.1 on GitHub (with `.mcpb`) and npm (`garmin-personal-api-mcp`, account `aaronhaddad_`, 2FA required)
+- MCPB extension installed and working in Claude Desktop on macOS (2026-10-25); demo GIF and walkthrough video are in the README
 - **Verified against a real key** (2026-10-24): setup, activity list, FIT splits and the performance-metrics tool all work on real data, and the list's field names match `summarizeActivity()`
 - npm name `garmin-connect-mcp` is taken, hence `garmin-personal-api-mcp`
 
@@ -50,7 +50,7 @@ Endpoint paths come from Garmin's Apache-2.0 client, github.com/garmin/connect-p
 
 Decided path: a local MCPB extension, not a remote connector (Garmin's terms, GDPR health data). Steps:
 
-1. ~~Push to GitHub~~ (done), publish to npm after real-key testing
+1. ~~Push to GitHub, publish to npm~~ (done: v1.0.1)
 2. ~~Add `manifest.json`~~ (done; `@anthropic-ai/mcpb` is a devDependency, no global install) (manifest_version 0.3):
    - `server`: node, entry `dist/index.js`
    - `user_config.api_key`: `{ type: string, sensitive: true, required: true }`, with a description holding the key-creation steps and link `https://connect.garmin.com/app/settings/personalApiToken`
@@ -60,7 +60,7 @@ Decided path: a local MCPB extension, not a remote connector (Garmin's terms, GD
 4. ~~Icon~~ (done, placeholder-quality pulse line; replace if you want something nicer): an original 512×512 PNG. Not Garmin's logo; follow Garmin brand guidelines, and keep the display name descriptive ("…for Garmin Connect")
 5. ~~Example prompts per tool~~ (done) in the README for reviewers
 6. ~~Add `windows-latest` to the CI matrix~~ (done; Node matrix is 22/24 because vitest 5 needs 22.12+, plus a job that packs the `.mcpb` as a CI artifact). Keychain code is macOS-only; on Windows the env var/file paths are used
-7. `mcpb pack`, install by double-click in Claude Desktop, test on macOS and Windows
+7. ~~`mcpb pack`, install by double-click in Claude Desktop~~ (done on macOS: installs disabled until the key is saved in Settings → Extensions, then works). Windows not tested
 8. ~~Extension-aware errors~~ (done): all five "run setup" sites (`NO_KEY`, expiry note and stderr banner in `server.ts`, 401 in `api.ts`, token exchange in `auth.ts`) use `keyFixHint()`. The expiry note is skipped for env-var keys, because `settings.keyExpiresOn` belongs to the key `setup` saved, not the extension's
 9. Submit via the MCP Directory Submission Form (linked from support.claude.com article 11596036). Reviewers will need test access: a Garmin account with some activities, plus a key
 

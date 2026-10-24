@@ -1,6 +1,7 @@
 # garmin-personal-api-mcp
 
 [![Latest release](https://img.shields.io/github/v/release/aaronhaddad/garmin-connect-mcp-claude-connector?label=release&cacheSeconds=3600)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest)
+[![npm](https://img.shields.io/npm/v/garmin-personal-api-mcp?logo=npm&label=npm&cacheSeconds=3600)](https://www.npmjs.com/package/garmin-personal-api-mcp)
 [![CI](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/actions/workflows/ci.yml/badge.svg)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 

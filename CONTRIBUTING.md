@@ -88,4 +88,4 @@ npm version patch            # or minor / major; bumps package.json and manifest
 git push --follow-tags
 ```
 
-The `v*` tag runs `.github/workflows/release.yml`, which checks, packs the extension and publishes a GitHub Release with `garmin-personal-api-mcp-<version>.mcpb` and the unversioned copy the README's download button points to.
+The `v*` tag runs `.github/workflows/release.yml`, which checks, packs the extension and publishes a GitHub Release with `garmin-personal-api-mcp-<version>.mcpb` and the unversioned copy the README's download button points to, then publishes the package to npm. npm trusts the workflow directly (trusted publishing), so there's no npm token in the repo secrets.
