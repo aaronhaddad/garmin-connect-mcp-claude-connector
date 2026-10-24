@@ -16,7 +16,9 @@ It ships with an interactive setup wizard that walks you through creating the AP
 
 ## Claude Desktop: install as an extension
 
-The simplest route on macOS and Windows. No terminal, no Node install.
+The simplest route on macOS and Windows. No terminal, no Node install. The 90-second walkthrough below shows the install, the key step and two questions.
+
+https://github.com/user-attachments/assets/84078971-fc1b-4f1c-9f02-168e73e9cbef
 
 1. Create a key: Garmin Connect → Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Create Key, and copy it.
 2. Download `garmin-personal-api-mcp-<version>.mcpb` from the releases page and double-click it (or drag it into Claude Desktop → Settings → Extensions).
