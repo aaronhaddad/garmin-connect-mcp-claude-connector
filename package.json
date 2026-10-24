@@ -13,7 +13,8 @@
     "prepublishOnly": "npm run build && npm test",
     "prepare": "npm run build",
     "check": "tsc --noEmit && vitest run && npm run smoke",
-    "pack:mcpb": "node scripts/pack-mcpb.mjs"
+    "pack:mcpb": "node scripts/pack-mcpb.mjs",
+    "version": "node scripts/sync-manifest-version.mjs && git add manifest.json"
   },
   "keywords": [
     "mcp",

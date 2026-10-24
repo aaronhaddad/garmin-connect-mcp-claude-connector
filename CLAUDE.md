@@ -8,6 +8,7 @@ MCP server for a user's own Garmin Connect data via Garmin's official **Personal
 - `npm run check`: type-check + vitest + end-to-end smoke test (`scripts/smoke.mjs` runs the built server against a fake Garmin API on localhost)
 - `npm run setup`: build, then run the interactive setup wizard
 - `npm run pack:mcpb`: build the Claude Desktop extension (`scripts/pack-mcpb.mjs` stages `dist/` with production-only deps, validates `manifest.json`, writes `garmin-personal-api-mcp-<version>.mcpb`)
+- `npm version patch && git push --follow-tags`: release. The `version` hook copies the version into `manifest.json`; the `v*` tag triggers `.github/workflows/release.yml`, which checks, packs and attaches the `.mcpb` to a GitHub Release (no npm publish yet)
 - `npx @modelcontextprotocol/inspector node dist/index.js`: manual tool testing
 
 Run `npm run check` after every change.

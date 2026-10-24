@@ -2,6 +2,8 @@
 
 Talk to your own Garmin data from Claude (or any MCP client), using Garmin's **official Personal API**. No password, no scraping, no reverse-engineered login.
 
+![Claude Desktop answering "What's my VO2 max and how has it moved this month?" with Garmin's VO2 max readings from the extension](docs/vo2max-demo.gif)
+
 > "How was my pacing on yesterday's run?"
 > "Compare my HRV and sleep this week with last week."
 > "Has my weight moved since I started the bulk in September?"
