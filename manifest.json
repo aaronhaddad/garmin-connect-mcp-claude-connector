@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "garmin-personal-api-mcp",
   "display_name": "Personal Data for Garmin Connect",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Read-only access to your own Garmin Connect activities, VO2 max, sleep, HRV, Body Battery and weight, via Garmin's official Personal API.",
   "long_description": "Ask Claude about your training and recovery using your own Garmin Connect data. Activities come with exact per-km splits computed from the original .FIT file, your VO2 max and training effect as Garmin Connect shows them, plus sleep, HRV, Body Battery, stress, steps, weight and nutrition.\n\nEverything runs on your computer: the extension exchanges your Personal API key for a 24-hour token with Garmin and makes read-only GET requests. No data passes through any third-party server.\n\nYou need a Garmin Connect account and a Personal API key: Garmin Connect → Settings → Personal API → Create Key (https://connect.garmin.com/app/settings/personalApiToken).\n\nThis is an independent project, not made or endorsed by Garmin. \"Garmin\" and \"Garmin Connect\" are trademarks of Garmin Ltd.",
   "author": {
