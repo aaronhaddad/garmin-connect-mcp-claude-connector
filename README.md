@@ -26,13 +26,25 @@ It ships with an interactive setup wizard that walks you through creating the AP
 └  All set. Restart Claude, then try: "How was my pacing on my last run?"
 ```
 
-## Quick start
+## Claude Desktop: install as an extension
+
+The simplest route on macOS and Windows. No terminal, no Node install.
+
+1. Create a key: Garmin Connect → Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Create Key, and copy it.
+2. Download `garmin-personal-api-mcp-<version>.mcpb` from the releases page and double-click it (or drag it into Claude Desktop → Settings → Extensions).
+3. Paste the key when Claude Desktop asks for it, and enable the extension.
+
+When the key expires, open Settings → Extensions → Personal Data for Garmin Connect and paste a new one.
+
+To build the extension yourself: `npm install && npm run pack:mcpb`.
+
+## Quick start (Claude Code, Cursor, other MCP clients)
 
 Requires Node.js 20.3 or later and a Garmin Connect account.
 
 ```bash
-git clone https://github.com/OWNER/garmin-personal-api-mcp.git
-cd garmin-personal-api-mcp
+git clone https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector.git
+cd garmin-connect-mcp-claude-connector
 npm install
 npm run setup
 ```
@@ -63,6 +75,33 @@ Restart Claude Desktop afterwards. That's it.
 | `garmin_download_activity_fit` | Save the original file locally, for Runalyze, Golden Cheetah and so on |
 | `garmin_api_get` | Escape hatch for any other documented Personal API endpoint |
 
+### Example prompts
+
+| Tool | Try asking |
+|---|---|
+| `garmin_get_profile` | "What are my heart-rate zones?" |
+| `garmin_list_activities` | "List my runs from the last two weeks." |
+| `garmin_get_activity` | "What was the training effect of my last ride?" |
+| `garmin_get_activity_splits` | "How was my pacing on yesterday's run? Did I fade?" |
+| `garmin_download_activity_fit` | "Save the FIT file of my last run to ~/Downloads." |
+| `garmin_get_day` | "How recovered am I today?" |
+| `garmin_get_daily_summaries` | "How many intensity minutes did I get each day this week?" |
+| `garmin_get_sleep` | "Compare my sleep this week with last week." |
+| `garmin_get_sleep_detail` | "Break down last night's sleep stages." |
+| `garmin_get_hrv` | "Is my HRV within my baseline this month?" |
+| `garmin_get_body_battery` | "How did my Body Battery recharge overnight this week?" |
+| `garmin_get_stress` | "Which day this week was most stressful?" |
+| `garmin_get_steps` | "Did I hit my step goal every day this month?" |
+| `garmin_get_hydration` | "How much water did I log yesterday?" |
+| `garmin_get_weight` | "Has my weight moved since September?" |
+| `garmin_get_weight_goals` | "What's my current weight goal?" |
+| `garmin_get_wellness_activities` | "Show my breathwork sessions this month." |
+| `garmin_get_heart_rate` | "What was my resting heart rate yesterday?" |
+| `garmin_get_spo2` | "What was my Pulse Ox last night?" |
+| `garmin_get_fitness_age` | "What's my fitness age?" |
+| `garmin_get_nutrition` | "What did I log for food yesterday?" |
+| `garmin_api_get` | "Get my menstrual cycle summary for this month." |
+
 Dates accept `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`. Long ranges are split into the chunk sizes Garmin accepts and merged for you.
 
 ## What the Personal API can't do
@@ -77,11 +116,15 @@ These limits are Garmin's, not this server's:
 
 - The key is stored in the **macOS Keychain** by default. On other systems it goes in `~/.config/garmin/connect-personal-api-key` with `chmod 600`, the same place Garmin's official Python client looks, so both tools share it.
 - The wizard reads the key through hidden input or straight from your clipboard (and offers to clear the clipboard afterwards). It never passes the key on a command line.
-- The key is exchanged for a 24-hour bearer token, cached in `~/.config/garmin-connect-mcp/token.json` (0600) and refreshed an hour before it expires.
+- The key is exchanged for a 24-hour bearer token, cached in `~/.config/garmin-personal-api-mcp/token.json` (0600) and refreshed an hour before it expires.
 - Every call is a GET to `personal.connectapi.garmin.com`. The raw tool only accepts paths under the documented services.
 - To revoke access: `npx garmin-personal-api-mcp logout`, then delete the key in Garmin Connect under Settings → Personal API.
 
-Key lookup order: `$GARMIN_PERSONAL_API_KEY`, then the Keychain, then the key file.
+Key lookup order: `$GARMIN_PERSONAL_API_KEY`, then the Keychain, then the key file. The Claude Desktop extension passes its key through `$GARMIN_PERSONAL_API_KEY`.
+
+## Privacy
+
+Nothing is collected. Data goes from Garmin to your computer to your MCP client and nowhere else. See [PRIVACY.md](PRIVACY.md).
 
 ## Commands
 

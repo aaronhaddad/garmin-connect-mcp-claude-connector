@@ -18,6 +18,10 @@ export const KEY_PAGE_URL = "https://connect.garmin.com/app/settings/personalApi
 export const DOCS_URL = "https://developer.garmin.com/gc-developer-program/personal/personal-api";
 
 export const API_KEY_ENV_VAR = "GARMIN_PERSONAL_API_KEY";
+/** manifest.json sets this to "mcpb" when Claude Desktop runs us as a desktop extension. */
+export const RUNTIME_ENV_VAR = "GARMIN_MCP_RUNTIME";
+/** Shown in Claude Desktop's extension list; keep in sync with manifest.json `display_name`. */
+export const EXTENSION_DISPLAY_NAME = "Personal Data for Garmin Connect";
 
 /** Same default path as Garmin's official Python client, so either tool can reuse the key. */
 export const DEFAULT_KEY_FILE = join(homedir(), ".config", "garmin", "connect-personal-api-key");

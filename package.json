@@ -4,7 +4,7 @@
   "description": "MCP server for your own Garmin Connect data (activities with FIT splits, sleep, HRV, Body Battery, weight) via Garmin's official Personal API, with an interactive key setup wizard.",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js",
+    "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
     "dev": "tsx src/index.ts",
     "setup": "npm run build && node dist/index.js setup",
     "test": "vitest run",
@@ -12,7 +12,8 @@
     "smoke": "npm run build && node scripts/smoke.mjs",
     "prepublishOnly": "npm run build && npm test",
     "prepare": "npm run build",
-    "check": "tsc --noEmit && vitest run && npm run smoke"
+    "check": "tsc --noEmit && vitest run && npm run smoke",
+    "pack:mcpb": "node scripts/pack-mcpb.mjs"
   },
   "keywords": [
     "mcp",
@@ -33,10 +34,12 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@anthropic-ai/mcpb": "^2.1.2",
     "@modelcontextprotocol/client": "^2.4.0",
     "@types/node": "^26.6.5",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5"
   },
   "type": "module",
@@ -46,14 +49,19 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "PRIVACY.md"
   ],
   "engines": {
     "node": ">=20.3"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OWNER/garmin-personal-api-mcp.git"
+    "url": "git+https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector.git"
   },
-  "author": "Haroun (Aaron) Haddad"
+  "author": "Haroun (Aaron) Haddad",
+  "homepage": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector#readme",
+  "bugs": {
+    "url": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/issues"
+  }
 }

@@ -11,8 +11,11 @@ import {
   API_KEY_ENV_VAR,
   CONFIG_DIR,
   DEFAULT_KEY_FILE,
+  EXTENSION_DISPLAY_NAME,
+  KEY_PAGE_URL,
   KEYCHAIN_ACCOUNT,
   KEYCHAIN_SERVICE,
+  RUNTIME_ENV_VAR,
   SETTINGS_FILE,
 } from "./constants.js";
 
@@ -29,6 +32,16 @@ export interface Settings {
   /** ISO date the user said the key expires, for reminders. */
   keyExpiresOn?: string;
   setupAt?: string;
+}
+
+/** True when Claude Desktop runs us as a desktop extension, where the key comes from its settings, not `setup`. */
+export const isExtension = (): boolean => process.env[RUNTIME_ENV_VAR] === "mcpb";
+
+/** How the user replaces a missing or rejected key, phrased for where we're running. Completes "Ask the user to …". */
+export function keyFixHint(): string {
+  return isExtension()
+    ? `open Claude Desktop → Settings → Extensions → ${EXTENSION_DISPLAY_NAME}, and paste a new key created at ${KEY_PAGE_URL}`
+    : "run `npx garmin-personal-api-mcp setup` in a terminal to add a new key";
 }
 
 export const keychainAvailable = (): boolean =>
