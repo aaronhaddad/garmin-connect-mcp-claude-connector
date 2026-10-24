@@ -1,6 +1,6 @@
 {
   "name": "garmin-personal-api-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "MCP server for your own Garmin Connect data (activities with FIT splits, sleep, HRV, Body Battery, weight) via Garmin's official Personal API, with an interactive key setup wizard.",
   "main": "dist/server.js",
   "scripts": {
