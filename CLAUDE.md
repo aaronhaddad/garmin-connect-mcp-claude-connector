@@ -57,7 +57,7 @@ Decided path: a local MCPB extension, not a remote connector (Garmin's terms, GD
    - `env`: `GARMIN_PERSONAL_API_KEY: ${user_config.api_key}`
    - `tools` list, `compatibility` (darwin, win32), `privacy_policies` (HTTPS URL)
 3. ~~`PRIVACY.md`~~ (done): collects nothing; data flows Garmin → user's machine → their MCP client. Link it from the README and manifest (both required, or the submission is rejected)
-4. ~~Icon~~ (done, placeholder-quality pulse line; replace if you want something nicer): an original 512×512 PNG. Not Garmin's logo; follow Garmin brand guidelines, and keep the display name descriptive ("…for Garmin Connect")
+4. ~~Icon~~ (done: watch-face ring with a heartbeat line, v1.0.3): an original 512×512 PNG. Not Garmin's logo; follow Garmin brand guidelines, and keep the display name descriptive ("…for Garmin Connect")
 5. ~~Example prompts per tool~~ (done) in the README for reviewers
 6. ~~Add `windows-latest` to the CI matrix~~ (done; Node matrix is 22/24 because vitest 5 needs 22.12+, plus a job that packs the `.mcpb` as a CI artifact). Keychain code is macOS-only; on Windows the env var/file paths are used
 7. ~~`mcpb pack`, install by double-click in Claude Desktop~~ (done on macOS: installs disabled until the key is saved in Settings → Extensions, then works). Windows not tested

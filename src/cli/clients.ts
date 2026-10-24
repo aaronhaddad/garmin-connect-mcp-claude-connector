@@ -43,6 +43,34 @@ export function claudeDesktopConfigPath(): string {
 
 const cursorConfigPath = () => join(homedir(), ".cursor", "mcp.json");
 
+export interface DesktopExtension {
+  version: string;
+  enabled: boolean;
+  hasKey: boolean;
+}
+
+/**
+ * Our Claude Desktop extension, if installed. Matched by manifest name, because the extension ID
+ * differs between a double-clicked .mcpb (`local.mcpb.…`) and a directory install. Only reports
+ * whether a key is set; never reads the key itself out of the settings file.
+ */
+export function findDesktopExtension(appDir = dirname(claudeDesktopConfigPath())): DesktopExtension | undefined {
+  try {
+    const installs = JSON.parse(readFileSync(join(appDir, "extensions-installations.json"), "utf8")) as {
+      extensions?: Record<string, { id: string; version: string; manifest?: { name?: string } }>;
+    };
+    const ext = Object.values(installs.extensions ?? {}).find((e) => e.manifest?.name === PACKAGE_NAME);
+    if (!ext) return undefined;
+    let settings: { isEnabled?: boolean; userConfig?: { api_key?: unknown } } = {};
+    const settingsPath = join(appDir, "Claude Extensions Settings", `${ext.id}.json`);
+    if (existsSync(settingsPath)) settings = JSON.parse(readFileSync(settingsPath, "utf8"));
+    const key = settings.userConfig?.api_key;
+    return { version: ext.version, enabled: settings.isEnabled === true, hasKey: typeof key === "string" && key.trim() !== "" };
+  } catch {
+    return undefined;
+  }
+}
+
 export function hasCommand(cmd: string): boolean {
   const probe = process.platform === "win32" ? spawnSync("where", [cmd]) : spawnSync("sh", ["-c", `command -v ${cmd}`]);
   return probe.status === 0;

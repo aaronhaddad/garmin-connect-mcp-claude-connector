@@ -2,13 +2,20 @@ import * as p from "@clack/prompts";
 import { exchangeKey, jwtClaims } from "../auth.js";
 import { DEFAULT_KEY_FILE, SERVER_NAME, TOKEN_CACHE_FILE, VERSION } from "../constants.js";
 import { daysUntilKeyExpiry, deleteKeychain, deleteKeyFile, maskKey, readSettings, resolveKey, writeSettings } from "../keystore.js";
-import { claudeDesktopConfigPath } from "./clients.js";
+import { claudeDesktopConfigPath, type DesktopExtension, findDesktopExtension } from "./clients.js";
 import { existsSync, readFileSync, rmSync } from "node:fs";
 
 export async function runStatus(): Promise<number> {
   p.intro(` Garmin Connect MCP · status v${VERSION} `);
   const key = resolveKey();
   if (!key) {
+    const ext = findDesktopExtension();
+    if (ext) {
+      // Extension-only users have no command-line key, and that's fine.
+      p.log.info(`No key saved for the command line. ${extensionLine(ext)}`);
+      p.outro(ext.enabled && ext.hasKey ? "The extension is set up; fix its key in Claude Desktop → Settings → Extensions if Claude reports a problem." : "Finish setting up the extension in Claude Desktop → Settings → Extensions.");
+      return 0;
+    }
     p.log.error("No key saved. Run `npx garmin-personal-api-mcp setup`.");
     p.outro("");
     return 1;
@@ -38,9 +45,20 @@ export async function runStatus(): Promise<number> {
 
   const desktop = claudeDesktopConfigPath();
   const inDesktop = existsSync(desktop) && readFileSync(desktop, "utf8").includes(`"${SERVER_NAME}"`);
-  p.log.info(`Claude Desktop: ${inDesktop ? "connected" : "not connected"} (${desktop})`);
+  const ext = findDesktopExtension();
+  if (ext) {
+    p.log.info(`${extensionLine(ext)} It uses the key saved in its own settings, not the one checked above.`);
+    if (inDesktop) p.log.warn(`Claude Desktop also has a "${SERVER_NAME}" entry in ${desktop}, so Garmin tools appear twice. Remove one of them.`);
+  } else {
+    p.log.info(`Claude Desktop: ${inDesktop ? "connected" : "not connected"} (${desktop})`);
+  }
   p.outro(ok ? "Healthy." : "Fix the key with `npx garmin-personal-api-mcp setup`.");
   return ok ? 0 : 1;
+}
+
+function extensionLine(ext: DesktopExtension): string {
+  const state = !ext.hasKey ? "installed, but no key is set in its settings" : ext.enabled ? "installed and on" : "installed, but switched off";
+  return `Claude Desktop extension: v${ext.version}, ${state}.`;
 }
 
 export function runLogout(): void {
