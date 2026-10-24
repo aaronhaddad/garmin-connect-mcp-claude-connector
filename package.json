@@ -59,7 +59,7 @@
     "type": "git",
     "url": "git+https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector.git"
   },
-  "author": "Haroun (Aaron) Haddad",
+  "author": "Aaron Haddad",
   "homepage": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector#readme",
   "bugs": {
     "url": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/issues"
