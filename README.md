@@ -4,56 +4,41 @@
 [![CI](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/actions/workflows/ci.yml/badge.svg)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Talk to your own Garmin data from Claude (or any MCP client), using Garmin's **official Personal API**. No password, no scraping, no reverse-engineered login.
+Ask Claude about your own Garmin data: runs, VO2 max, sleep, HRV, Body Battery, weight. It uses Garmin's **official Personal API**, so there's no password, no scraping and no reverse-engineered login.
 
 [![Download the Claude Desktop extension](https://img.shields.io/badge/Download-Claude%20Desktop%20extension%20%28.mcpb%29-D97757?style=for-the-badge)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest/download/garmin-personal-api-mcp.mcpb)
 
 ![Claude Desktop answering "What's my VO2 max and how has it moved this month?" with Garmin's VO2 max readings from the extension](docs/vo2max-demo.gif)
 
-> "How was my pacing on yesterday's run?"
+**Contents:** [Install](#install-in-claude-desktop) · [What you can ask](#what-you-can-ask) · [What it can't do](#what-it-cant-do) · [Your data](#your-data-and-your-key) · [Claude Code, Cursor and other apps](#claude-code-cursor-and-other-apps) · [Contributing](#contributing)
+
+## Install in Claude Desktop
+
+macOS or Windows. No terminal, no Node install. You need a Garmin Connect account.
+
+1. **Create a key.** In Garmin Connect, open Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Create Key, and copy it.
+2. **[Download the extension](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest/download/garmin-personal-api-mcp.mcpb)** and double-click it, then click Install.
+3. **Add the key.** Claude Desktop installs the extension switched off until it has a key. Open Settings → Extensions → Personal Data for Garmin Connect, paste the key, click Save and switch it on.
+
+Then start a new chat and ask away. The 90-second walkthrough shows all three steps and two questions:
+
+https://github.com/user-attachments/assets/84078971-fc1b-4f1c-9f02-168e73e9cbef
+
+**When your key expires**, create a new one in Garmin Connect and paste it in the same place. Claude tells you when this happens.
+
+**Updating:** download the latest version with the same button and double-click it. The badge at the top shows the current version, and the [releases page](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases) lists what changed in each one.
+
+## What you can ask
+
+> "How was my pacing on yesterday's run? Did I fade?"
+> "What's my VO2 max, and how has it moved this month?"
+> "How recovered am I today?"
 > "Compare my HRV and sleep this week with last week."
 > "Has my weight moved since I started the bulk in September?"
 
 ![Claude answering "how was my pacing on the last run?" with exact per-km splits, heart rate and a pacing verdict](docs/pacing-answer.png)
 
-It ships with an interactive setup wizard that walks you through creating the API key, checks it with Garmin, stores it in your macOS Keychain and wires it into Claude Desktop, Claude Code or Cursor.
-
-![The setup wizard: create a key, verify it with Garmin, save it to the Keychain and connect Claude Desktop, Claude Code and Cursor](docs/setup-wizard.png)
-
-## Claude Desktop: install as an extension
-
-The simplest route on macOS and Windows. No terminal, no Node install. The 90-second walkthrough below shows the install, the key step and two questions.
-
-https://github.com/user-attachments/assets/84078971-fc1b-4f1c-9f02-168e73e9cbef
-
-1. Create a key: Garmin Connect → Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Create Key, and copy it.
-2. [Download the extension](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest/download/garmin-personal-api-mcp.mcpb) and double-click it (or drag it into Claude Desktop → Settings → Extensions). Older versions are on the [releases page](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases).
-3. Claude Desktop installs it switched off until it has a key. Open Settings → Extensions → Personal Data for Garmin Connect, paste the key, click Save and switch it on.
-
-When the key expires, open Settings → Extensions → Personal Data for Garmin Connect and paste a new one.
-
-To build the extension yourself: `npm install && npm run pack:mcpb`.
-
-## Quick start (Claude Code, Cursor, other MCP clients)
-
-Requires Node.js 20.3 or later and a Garmin Connect account.
-
-```bash
-git clone https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector.git
-cd garmin-connect-mcp-claude-connector
-npm install
-npm run setup
-```
-
-Once the package is on npm, this becomes a one-liner:
-
-```bash
-npx garmin-personal-api-mcp setup
-```
-
-Restart Claude Desktop afterwards. That's it.
-
-## What you can ask
+Dates can be `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`.
 
 <details>
 <summary>All 23 tools and what they give Claude</summary>
@@ -70,6 +55,7 @@ Restart Claude Desktop afterwards. That's it.
 | `garmin_get_hrv` | Overnight HRV, baseline and status |
 | `garmin_get_body_battery`, `garmin_get_stress`, `garmin_get_steps`, `garmin_get_hydration` | Daily wellness series |
 | `garmin_get_weight`, `garmin_get_weight_goals` | Weigh-ins and body composition |
+| `garmin_get_wellness_activities` | Breathwork, relaxation and other wellness sessions |
 | `garmin_get_heart_rate`, `garmin_get_spo2`, `garmin_get_fitness_age`, `garmin_get_nutrition` | Single-day detail |
 | `garmin_get_profile` | Units, profile and heart-rate zones |
 | `garmin_download_activity_fit` | Save the original file locally, for Runalyze, Golden Cheetah and so on |
@@ -108,44 +94,51 @@ Restart Claude Desktop afterwards. That's it.
 
 </details>
 
-Dates accept `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`. Long ranges are split into the chunk sizes Garmin accepts and merged for you.
+## What it can't do
 
-## What the Personal API can't do
+These limits are Garmin's, not this extension's:
 
-These limits are Garmin's, not this server's:
+- **Read-only.** It can't push workouts, courses or training plans to your watch. Garmin keeps those APIs for business partners.
+- **No training readiness, training status or race predictions.** Garmin computes those on its servers and doesn't expose them. VO2 max, training effect and recovery time *are* available, because your watch writes them into each activity file. VO2 max and training effect match Garmin Connect; recovery time and performance condition are approximate.
+- **Your account only.** A key only reads the account that created it.
 
-- **Read-only.** You can't push workouts, courses or training plans to your watch. Garmin keeps the Training and Courses APIs in its business tiers.
-- **No server-side coaching metrics** such as training readiness, training status or race predictions. VO2 max, training effect and recovery time *are* available: Garmin's watches write them into each activity file, and `garmin_get_performance_metrics` decodes them. VO2 max and training effect match Garmin Connect; recovery time and performance condition come from undocumented fields and are approximate.
-- **Your account only.** The key only reads the account that created it.
+## Your data and your key
 
-## Security
+- **Nothing is collected.** Everything runs on your computer: data goes from Garmin to your computer to Claude and nowhere else. See [PRIVACY.md](PRIVACY.md).
+- **Read-only.** Every request is a read. Nothing can change or delete your Garmin data.
+- **Your key stays on your computer.** Claude Desktop stores it in its extension settings, and it's only ever sent to Garmin.
+- **To remove access**, uninstall the extension in Claude Desktop and delete the key in Garmin Connect under Settings → Personal API.
 
-- The key is stored in the **macOS Keychain** by default. On other systems it goes in `~/.config/garmin/connect-personal-api-key` with `chmod 600`, the same place Garmin's official Python client looks, so both tools share it.
-- The wizard reads the key through hidden input or straight from your clipboard (and offers to clear the clipboard afterwards). It never passes the key on a command line.
-- The key is exchanged for a 24-hour bearer token, cached in `~/.config/garmin-personal-api-mcp/token.json` (0600) and refreshed an hour before it expires.
-- Every call is a GET to `personal.connectapi.garmin.com`. The raw tool only accepts paths under the documented services.
-- To revoke access: `npx garmin-personal-api-mcp logout`, then delete the key in Garmin Connect under Settings → Personal API.
+This is an independent project, not made or endorsed by Garmin. "Garmin" and "Garmin Connect" are trademarks of Garmin Ltd.
 
-Key lookup order: `$GARMIN_PERSONAL_API_KEY`, then the Keychain, then the key file. The Claude Desktop extension passes its key through `$GARMIN_PERSONAL_API_KEY`.
+## Claude Code, Cursor and other apps
 
-## Privacy
+For any other MCP app, run the server from the command line. You need Node.js 20.3 or later.
 
-Nothing is collected. Data goes from Garmin to your computer to your MCP client and nowhere else. See [PRIVACY.md](PRIVACY.md).
-
-## Commands
-
+```bash
+git clone https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector.git
+cd garmin-connect-mcp-claude-connector
+npm install
+npm run setup
 ```
-garmin-personal-api-mcp setup     Interactive setup: key + connect apps
-garmin-personal-api-mcp status    Check the saved key still works, and when it expires
-garmin-personal-api-mcp logout    Remove the saved key and cached token
-garmin-personal-api-mcp           Run the MCP server on stdio (what your MCP client launches)
-```
+
+The setup wizard walks you through creating the key, checks it with Garmin, stores it in your macOS Keychain and connects Claude Desktop, Claude Code or Cursor. Restart those apps afterwards.
+
+![The setup wizard: create a key, verify it with Garmin, save it to the Keychain and connect Claude Desktop, Claude Code and Cursor](docs/setup-wizard.png)
+
+From a clone, run these as `node dist/index.js <command>`.
+
+| Command | What it does |
+|---|---|
+| `garmin-personal-api-mcp setup` | Interactive setup: key and connected apps |
+| `garmin-personal-api-mcp status` | Checks the saved key still works, and when it expires |
+| `garmin-personal-api-mcp logout` | Removes the saved key and cached token |
+| `garmin-personal-api-mcp` | Runs the MCP server on stdio (what your MCP app launches) |
 
 For scripts and dotfiles: `pbpaste | garmin-personal-api-mcp setup --key-stdin --storage keychain`.
 
-### Manual client config
-
-If you'd rather not let the wizard edit your config, add this yourself:
+<details>
+<summary>Manual config, if you'd rather not let the wizard edit it</summary>
 
 ```json
 {
@@ -160,19 +153,15 @@ If you'd rather not let the wizard edit your config, add this yourself:
 
 Claude Code: `claude mcp add --scope user garmin-connect -- node /absolute/path/to/dist/index.js`
 
-## Development
+</details>
 
-```bash
-npm install
-npm run check      # type-check, unit tests, and an end-to-end MCP smoke test against a fake Garmin API
-npx @modelcontextprotocol/inspector node dist/index.js
-```
+---
+
+## Contributing
+
+Issues and pull requests are welcome. The server stays read-only and local (one user, their own key); [CONTRIBUTING.md](CONTRIBUTING.md) has the setup, how it works, how to add a tool and the PR checklist.
 
 Built on the MCP TypeScript SDK v2, Garmin's [FIT JavaScript SDK](https://github.com/garmin/fit-javascript-sdk) and [@clack/prompts](https://github.com/bombshell-dev/clack). Endpoint paths follow Garmin's Apache-2.0 [connect-personal-api-python](https://github.com/garmin/connect-personal-api-python) client.
-
-## Disclaimer
-
-This is an independent project, not made or endorsed by Garmin. It only uses Garmin's documented Personal API, and your use of that API is subject to Garmin's terms. "Garmin" and "Garmin Connect" are trademarks of Garmin Ltd.
 
 ## License
 
