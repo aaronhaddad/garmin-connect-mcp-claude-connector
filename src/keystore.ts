@@ -37,11 +37,15 @@ export interface Settings {
 /** True when Claude Desktop runs us as a desktop extension, where the key comes from its settings, not `setup`. */
 export const isExtension = (): boolean => process.env[RUNTIME_ENV_VAR] === "mcpb";
 
+/** True when a Claude plugin (Claude Code, Cowork) runs us; the key comes from the plugin's userConfig or, failing that, from `setup`. */
+export const isPlugin = (): boolean => process.env[RUNTIME_ENV_VAR] === "plugin";
+
 /** How the user replaces a missing or rejected key, phrased for where we're running. Completes "Ask the user to …". */
 export function keyFixHint(): string {
-  return isExtension()
-    ? `open Claude Desktop → Settings → Extensions → ${EXTENSION_DISPLAY_NAME}, and paste a new key created at ${KEY_PAGE_URL}`
-    : "run `npx garmin-personal-api-mcp setup` in a terminal to add a new key";
+  if (isExtension()) return `open Claude Desktop → Settings → Extensions → ${EXTENSION_DISPLAY_NAME}, and paste a new key created at ${KEY_PAGE_URL}`;
+  if (isPlugin())
+    return `create a new key at ${KEY_PAGE_URL}, then either paste it into the plugin's settings (in Claude Code: /plugin → Installed → ${EXTENSION_DISPLAY_NAME} → Configure) or run \`npx garmin-personal-api-mcp setup\` in a terminal to save it on this computer`;
+  return "run `npx garmin-personal-api-mcp setup` in a terminal to add a new key";
 }
 
 /** Appended to key errors: without it the model goes looking for the data in a browser instead of telling the user. */
@@ -102,7 +106,8 @@ export function deleteKeyFile(path = DEFAULT_KEY_FILE): boolean {
 
 export function resolveKey(): ResolvedKey | undefined {
   const env = process.env[API_KEY_ENV_VAR]?.trim();
-  if (env) return { key: env, source: "env", location: `$${API_KEY_ENV_VAR}` };
+  // An app that doesn't fill in plugin settings can pass the template through untouched; that's not a key.
+  if (env && !env.startsWith("${")) return { key: env, source: "env", location: `$${API_KEY_ENV_VAR}` };
   const kc = readKeychain();
   if (kc) return { key: kc, source: "keychain", location: `macOS Keychain (${KEYCHAIN_SERVICE})` };
   const file = readKeyFile();

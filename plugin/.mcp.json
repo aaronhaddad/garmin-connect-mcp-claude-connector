@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "garmin": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "garmin-personal-api-mcp@1.1.0"
+      ],
+      "env": {
+        "GARMIN_PERSONAL_API_KEY": "${user_config.api_key}",
+        "GARMIN_MCP_RUNTIME": "plugin"
+      }
+    }
+  }
+}

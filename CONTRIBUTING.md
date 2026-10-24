@@ -43,6 +43,7 @@ To test the extension, double-click the `.mcpb` you packed, then add your key in
 | `src/format.ts` | Activity summaries and trimming responses to fit the model's limits |
 | `src/cli/` | The setup wizard, `status` and `logout` |
 | `manifest.json`, `icon.png`, `PRIVACY.md` | The Claude Desktop extension |
+| `plugin/`, `.claude-plugin/marketplace.json` | The Claude plugin for Claude Code and Cowork: manifest, `.mcp.json` (runs the npm package, pinned) and the `garmin-training-insights` skill |
 | `scripts/smoke.mjs` | The end-to-end smoke test and its fake Garmin API |
 
 [CLAUDE.md](CLAUDE.md) has more detail on conventions.
@@ -61,6 +62,8 @@ A new tool has to be added in four places:
 2. **`manifest.json`:** add it to the `tools` list. This is what the install screen shows.
 3. **`README.md`:** add a row to both collapsible tables: what it gives Claude, and an example prompt.
 4. **`scripts/smoke.mjs`:** if it's a core tool, add it to the list of names the smoke test requires, and call it against the fake API.
+
+If the tool answers a new kind of question, add it to the table in `plugin/skills/garmin-training-insights/SKILL.md` too, and run `claude plugin validate ./plugin`.
 
 If the tool changes which tool Claude should reach for first, update the instructions in `src/server.ts` too.
 

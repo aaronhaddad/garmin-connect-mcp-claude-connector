@@ -1,0 +1,15 @@
+{
+  "name": "garmin-personal-api",
+  "description": "Personal Data for Garmin Connect: your own Garmin data in Claude Code and Cowork, through Garmin's official read-only Personal API.",
+  "owner": {
+    "name": "Aaron Haddad",
+    "url": "https://github.com/aaronhaddad"
+  },
+  "plugins": [
+    {
+      "name": "garmin-personal-api-mcp",
+      "source": "./plugin",
+      "description": "Your own Garmin Connect data in Claude, through Garmin's official read-only Personal API."
+    }
+  ]
+}

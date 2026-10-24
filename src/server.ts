@@ -3,10 +3,11 @@ import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { GarminClient } from "./api.js";
 import { TokenManager } from "./auth.js";
 import { SERVER_NAME, VERSION } from "./constants.js";
-import { daysUntilKeyExpiry, isExtension, KEY_STOP_NOTE, keyFixHint, type KeySource, resolveKey } from "./keystore.js";
+import { daysUntilKeyExpiry, isExtension, isPlugin, KEY_STOP_NOTE, keyFixHint, type KeySource, resolveKey } from "./keystore.js";
 import { registerTools } from "./tools.js";
 
 function noKeyMessage(): string {
+  if (isPlugin()) return `No Garmin Personal API key is set for this plugin or on this computer. Ask the user to ${keyFixHint()}. ${KEY_STOP_NOTE}`;
   return isExtension()
     ? `No Garmin Personal API key is set in this extension. Ask the user to ${keyFixHint()}. ${KEY_STOP_NOTE}`
     : "No Garmin Personal API key is set up on this computer. Ask the user to run `npx garmin-personal-api-mcp setup` in a terminal (it walks them through creating and saving the key), then restart this app. " + KEY_STOP_NOTE;

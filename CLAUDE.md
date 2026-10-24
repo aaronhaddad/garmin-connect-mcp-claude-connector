@@ -26,6 +26,7 @@ Gotchas on this machine: Node lives in nvm (`~/.nvm/versions/node/v24.16.0/bin`)
 - `src/format.ts`: activity summaries, null-stripping, downsampling to stay under the 25k character limit
 - `src/keystore.ts`: key lookup order `$GARMIN_PERSONAL_API_KEY` → macOS Keychain (`security -i`, never on argv) → `~/.config/garmin/connect-personal-api-key` (shared with Garmin's Python client)
 - `src/cli/`: clack wizard, client registration (Claude Desktop / Claude Code / Cursor), status/logout
+- `plugin/`: the Claude plugin (Claude Code, Cowork): `.claude-plugin/plugin.json` with a sensitive `userConfig.api_key` (default `""`, because Cowork skips servers whose options have no default), `.mcp.json` running `npx -y garmin-personal-api-mcp@<exact version>` with `GARMIN_MCP_RUNTIME=plugin`, and the `garmin-training-insights` skill. `.claude-plugin/marketplace.json` at the repo root makes the repo installable as a marketplace. `npm version` keeps the plugin's version and npx pin in step (`scripts/sync-manifest-version.mjs`). Validate with `claude plugin validate ./plugin`
 - `manifest.json`, `icon.png`, `PRIVACY.md`: the MCPB extension. Bump `manifest.json` `version` with `package.json` (the pack script refuses a mismatch). `display_name` must match `EXTENSION_DISPLAY_NAME` in `src/constants.ts`
 - Key-fix messages go through `keyFixHint()` in `src/keystore.ts`: "run setup" for the CLI, "Claude Desktop → Settings → Extensions" when `GARMIN_MCP_RUNTIME=mcpb` (set by the manifest). Never hardcode "run setup" in a message the model or user sees
 
@@ -46,7 +47,7 @@ Endpoint paths come from Garmin's Apache-2.0 client, github.com/garmin/connect-p
 - **Verified against a real key** (2026-10-24): setup, activity list, FIT splits and the performance-metrics tool all work on real data, and the list's field names match `summarizeActivity()`
 - npm name `garmin-connect-mcp` is taken, hence `garmin-personal-api-mcp`
 
-## Next: Claude Connectors Directory as a desktop extension (.mcpb)
+## Distribution: desktop extension (.mcpb), npm, and the Claude plugin
 
 Decided path: a local MCPB extension, not a remote connector (Garmin's terms, GDPR health data). Steps:
 
@@ -62,7 +63,7 @@ Decided path: a local MCPB extension, not a remote connector (Garmin's terms, GD
 6. ~~Add `windows-latest` to the CI matrix~~ (done; Node matrix is 22/24 because vitest 5 needs 22.12+, plus a job that packs the `.mcpb` as a CI artifact). Keychain code is macOS-only; on Windows the env var/file paths are used
 7. ~~`mcpb pack`, install by double-click in Claude Desktop~~ (done on macOS: installs disabled until the key is saved in Settings → Extensions, then works). Windows not tested
 8. ~~Extension-aware errors~~ (done): all five "run setup" sites (`NO_KEY`, expiry note and stderr banner in `server.ts`, 401 in `api.ts`, token exchange in `auth.ts`) use `keyFixHint()`. The expiry note is skipped for env-var keys, because `settings.keyExpiresOn` belongs to the key `setup` saved, not the extension's
-9. Submit via the MCP Directory Submission Form (linked from support.claude.com article 11596036). Reviewers will need test access: a Garmin account with some activities, plus a key
+9. **Changed (2026-10-25):** the directory no longer accepts `.mcpb` extensions (desktop extension listings are deprecated); local servers are listed only inside a plugin. Submit `plugin/` at claude.ai/directory/manage → Submit new → **Plugin bundle**, repo `aaronhaddad/garmin-connect-mcp-claude-connector`, plugin path `plugin`. A pinned npx package is always held for a human reviewer, and the Garmin name likely triggers a brand hold; both are expected. The plugin's local server runs in Claude Code and Cowork on the user's computer, not in plain chat, so the `.mcpb` download stays for Claude Desktop chat users
 
 ## How the extension works (target behaviour)
 

@@ -114,7 +114,15 @@ This is an independent project, not made or endorsed by Garmin. "Garmin" and "Ga
 
 ## Claude Code, Cursor and other apps
 
-For any other MCP app, run the server from the command line. You need Node.js 20.3 or later.
+**Claude Code and Cowork:** install the plugin, which adds the server plus a skill that tells Claude how to answer training and recovery questions:
+
+```
+/plugin install garmin-personal-api-mcp --marketplace aaronhaddad/garmin-connect-mcp-claude-connector
+```
+
+Claude Code asks for your key when you install it. Cowork doesn't ask, so run the setup below once and the plugin uses the saved key. See the [plugin README](plugin/README.md) for details.
+
+**Any other MCP app**, or to save the key on your computer: run the setup wizard. You need Node.js 20.3 or later.
 
 ```bash
 npx garmin-personal-api-mcp setup

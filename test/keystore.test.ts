@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { GarminApiError } from "../src/api.js";
-import { daysUntilKeyExpiry, keyFixHint } from "../src/keystore.js";
+import { daysUntilKeyExpiry, keyFixHint, resolveKey } from "../src/keystore.js";
 import { keyExpiryNote } from "../src/server.js";
 
 afterEach(() => vi.unstubAllEnvs());
@@ -34,5 +34,17 @@ describe("keyExpiryNote", () => {
   });
   it("counts days to the end of the expiry date", () => {
     expect(daysUntilKeyExpiry({ keyExpiresOn: "2026-10-31" }, new Date("2026-10-24T10:00:00"))).toBe(7);
+  });
+});
+
+describe("plugin runtime", () => {
+  it("points plugin users at the plugin's Configure screen or setup", () => {
+    vi.stubEnv("GARMIN_MCP_RUNTIME", "plugin");
+    expect(keyFixHint()).toMatch(/\/plugin → Installed → .* → Configure/);
+    expect(keyFixHint()).toMatch(/npx garmin-personal-api-mcp setup/);
+  });
+  it("treats an unfilled ${user_config…} template as no key", () => {
+    vi.stubEnv("GARMIN_PERSONAL_API_KEY", "${user_config.api_key}");
+    expect(resolveKey()?.source).not.toBe("env");
   });
 });

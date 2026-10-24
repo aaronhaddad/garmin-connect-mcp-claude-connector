@@ -1,0 +1,37 @@
+{
+  "name": "garmin-personal-api-mcp",
+  "displayName": "Personal Data for Garmin Connect",
+  "version": "1.1.0",
+  "description": "Ask Claude about your own Garmin Connect data (runs with exact splits, VO2 max, training load, sleep, HRV, Body Battery, weight) through Garmin's official, read-only Personal API.",
+  "author": {
+    "name": "Aaron Haddad",
+    "url": "https://github.com/aaronhaddad"
+  },
+  "homepage": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector#readme",
+  "repository": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector",
+  "license": "MIT",
+  "keywords": [
+    "garmin",
+    "garmin-connect",
+    "running",
+    "fitness",
+    "sleep",
+    "hrv",
+    "vo2max",
+    "health"
+  ],
+  "icon": "./icon.png",
+  "documentationUrl": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/blob/main/plugin/README.md",
+  "supportUrl": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/issues",
+  "privacyPolicyUrl": "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/blob/main/PRIVACY.md",
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Garmin Personal API key",
+      "description": "Create one at https://connect.garmin.com/app/settings/personalApiToken (Garmin Connect → Settings → Personal API → Create Key). Leave empty to use a key saved on this computer with `npx garmin-personal-api-mcp setup`.",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    }
+  }
+}
