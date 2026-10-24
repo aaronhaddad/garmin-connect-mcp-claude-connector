@@ -1,6 +1,12 @@
 # garmin-personal-api-mcp
 
+[![Latest release](https://img.shields.io/github/v/release/aaronhaddad/garmin-connect-mcp-claude-connector?label=release)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest)
+[![CI](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/actions/workflows/ci.yml/badge.svg)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Talk to your own Garmin data from Claude (or any MCP client), using Garmin's **official Personal API**. No password, no scraping, no reverse-engineered login.
+
+[![Download the Claude Desktop extension](https://img.shields.io/badge/Download-Claude%20Desktop%20extension%20%28.mcpb%29-D97757?style=for-the-badge)](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest/download/garmin-personal-api-mcp.mcpb)
 
 ![Claude Desktop answering "What's my VO2 max and how has it moved this month?" with Garmin's VO2 max readings from the extension](docs/vo2max-demo.gif)
 
@@ -21,7 +27,7 @@ The simplest route on macOS and Windows. No terminal, no Node install. The 90-se
 https://github.com/user-attachments/assets/84078971-fc1b-4f1c-9f02-168e73e9cbef
 
 1. Create a key: Garmin Connect → Settings → [Personal API](https://connect.garmin.com/app/settings/personalApiToken) → Create Key, and copy it.
-2. Download `garmin-personal-api-mcp-<version>.mcpb` from the releases page and double-click it (or drag it into Claude Desktop → Settings → Extensions).
+2. [Download the extension](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases/latest/download/garmin-personal-api-mcp.mcpb) and double-click it (or drag it into Claude Desktop → Settings → Extensions). Older versions are on the [releases page](https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/releases).
 3. Claude Desktop installs it switched off until it has a key. Open Settings → Extensions → Personal Data for Garmin Connect, paste the key, click Save and switch it on.
 
 When the key expires, open Settings → Extensions → Personal Data for Garmin Connect and paste a new one.
@@ -49,6 +55,9 @@ Restart Claude Desktop afterwards. That's it.
 
 ## What you can ask
 
+<details>
+<summary>All 23 tools and what they give Claude</summary>
+
 | Tool | What it gives Claude |
 |---|---|
 | `garmin_list_activities` | Your activities with distance, time, pace and heart rate. Filter by date and type |
@@ -66,7 +75,10 @@ Restart Claude Desktop afterwards. That's it.
 | `garmin_download_activity_fit` | Save the original file locally, for Runalyze, Golden Cheetah and so on |
 | `garmin_api_get` | Escape hatch for any other documented Personal API endpoint |
 
-### Example prompts
+</details>
+
+<details>
+<summary>Example prompts for every tool</summary>
 
 | Tool | Try asking |
 |---|---|
@@ -93,6 +105,8 @@ Restart Claude Desktop afterwards. That's it.
 | `garmin_get_fitness_age` | "What's my fitness age?" |
 | `garmin_get_nutrition` | "What did I log for food yesterday?" |
 | `garmin_api_get` | "Get my menstrual cycle summary for this month." |
+
+</details>
 
 Dates accept `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`. Long ranges are split into the chunk sizes Garmin accepts and merged for you.
 
