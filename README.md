@@ -116,26 +116,21 @@ This is an independent project, not made or endorsed by Garmin. "Garmin" and "Ga
 For any other MCP app, run the server from the command line. You need Node.js 20.3 or later.
 
 ```bash
-git clone https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector.git
-cd garmin-connect-mcp-claude-connector
-npm install
-npm run setup
+npx garmin-personal-api-mcp setup
 ```
 
-The setup wizard walks you through creating the key, checks it with Garmin, stores it in your macOS Keychain and connects Claude Desktop, Claude Code or Cursor. Restart those apps afterwards.
+The setup wizard walks you through creating the key, checks it with Garmin, stores it in your macOS Keychain and connects Claude Desktop, Claude Code or Cursor. Restart those apps afterwards. They run the server with `npx`, so they pick up new versions automatically.
 
 ![The setup wizard: create a key, verify it with Garmin, save it to the Keychain and connect Claude Desktop, Claude Code and Cursor](docs/setup-wizard.png)
 
-From a clone, run these as `node dist/index.js <command>`.
-
 | Command | What it does |
 |---|---|
-| `garmin-personal-api-mcp setup` | Interactive setup: key and connected apps |
-| `garmin-personal-api-mcp status` | Checks the saved key still works, and when it expires |
-| `garmin-personal-api-mcp logout` | Removes the saved key and cached token |
-| `garmin-personal-api-mcp` | Runs the MCP server on stdio (what your MCP app launches) |
+| `npx garmin-personal-api-mcp setup` | Interactive setup: key and connected apps |
+| `npx garmin-personal-api-mcp status` | Checks the saved key still works, and when it expires |
+| `npx garmin-personal-api-mcp logout` | Removes the saved key and cached token |
+| `npx garmin-personal-api-mcp` | Runs the MCP server on stdio (what your MCP app launches) |
 
-For scripts and dotfiles: `pbpaste | garmin-personal-api-mcp setup --key-stdin --storage keychain`.
+For scripts and dotfiles: `pbpaste | npx garmin-personal-api-mcp setup --key-stdin --storage keychain`.
 
 <details>
 <summary>Manual config, if you'd rather not let the wizard edit it</summary>
@@ -144,14 +139,16 @@ For scripts and dotfiles: `pbpaste | garmin-personal-api-mcp setup --key-stdin -
 {
   "mcpServers": {
     "garmin-connect": {
-      "command": "node",
-      "args": ["/absolute/path/to/garmin-personal-api-mcp/dist/index.js"]
+      "command": "npx",
+      "args": ["-y", "garmin-personal-api-mcp"]
     }
   }
 }
 ```
 
-Claude Code: `claude mcp add --scope user garmin-connect -- node /absolute/path/to/dist/index.js`
+Claude Code: `claude mcp add --scope user garmin-connect -- npx -y garmin-personal-api-mcp`
+
+The server reads the key from `$GARMIN_PERSONAL_API_KEY`, the macOS Keychain or `~/.config/garmin/connect-personal-api-key`, so run `setup` once to save it even if you write the config yourself.
 
 </details>
 
