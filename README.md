@@ -6,25 +6,11 @@ Talk to your own Garmin data from Claude (or any MCP client), using Garmin's **o
 > "Compare my HRV and sleep this week with last week."
 > "Has my weight moved since I started the bulk in September?"
 
+![Claude answering "how was my pacing on the last run?" with exact per-km splits, heart rate and a pacing verdict](docs/pacing-answer.png)
+
 It ships with an interactive setup wizard that walks you through creating the API key, checks it with Garmin, stores it in your macOS Keychain and wires it into Claude Desktop, Claude Code or Cursor.
 
-```
-┌   Garmin Connect MCP · setup
-◇  Step 1 · Create a Personal API key
-│  1. Sign in to Garmin Connect in the browser
-│  2. Settings → Personal API → Create Key
-│  ...
-◇  Paste the key (input is hidden)
-│  ••••••••••••••••••••••••
-◇  Garmin accepted the key
-◇  Step 2 · Verified
-│  Latest:    Evening Run, 8.1 km on 2026-10-21
-│  Mode:      read-only. Nothing can be written to your account.
-◆  Connect it to which apps?
-│  ◼ Claude Desktop
-│  ◼ Claude Code
-└  All set. Restart Claude, then try: "How was my pacing on my last run?"
-```
+![The setup wizard: create a key, verify it with Garmin, save it to the Keychain and connect Claude Desktop, Claude Code and Cursor](docs/setup-wizard.png)
 
 ## Claude Desktop: install as an extension
 
@@ -63,6 +49,7 @@ Restart Claude Desktop afterwards. That's it.
 |---|---|
 | `garmin_list_activities` | Your activities with distance, time, pace and heart rate. Filter by date and type |
 | `garmin_get_activity_splits` | Downloads the original `.FIT` file and computes **exact** km (or mile, or 400 m) splits, interpolated at each boundary with pauses removed, plus per-split HR, cadence and climb, device laps, and a pacing verdict (even, negative split, faded) |
+| `garmin_get_performance_metrics` | Your **VO2 max** as Garmin Connect shows it, every VO2 max reading in a window, and per-activity aerobic/anaerobic training effect, recovery time and performance condition, decoded from the activity files |
 | `garmin_get_activity` | Garmin's own summary for one activity |
 | `garmin_get_day` | One call for a day: summary, sleep, HRV, Body Battery and activities |
 | `garmin_get_daily_summaries` | Steps, calories, resting HR, stress and intensity minutes across a date range |
@@ -81,6 +68,7 @@ Restart Claude Desktop afterwards. That's it.
 |---|---|
 | `garmin_get_profile` | "What are my heart-rate zones?" |
 | `garmin_list_activities` | "List my runs from the last two weeks." |
+| `garmin_get_performance_metrics` | "What's my VO2 max, and how has it moved this month?" |
 | `garmin_get_activity` | "What was the training effect of my last ride?" |
 | `garmin_get_activity_splits` | "How was my pacing on yesterday's run? Did I fade?" |
 | `garmin_download_activity_fit` | "Save the FIT file of my last run to ~/Downloads." |
@@ -109,7 +97,7 @@ Dates accept `YYYY-MM-DD`, `today`, `yesterday` or `N days ago`. Long ranges are
 These limits are Garmin's, not this server's:
 
 - **Read-only.** You can't push workouts, courses or training plans to your watch. Garmin keeps the Training and Courses APIs in its business tiers.
-- **No derived metrics** such as VO2 max, training readiness, training status or recovery time. Garmin strips some of these from files delivered through its API.
+- **No server-side coaching metrics** such as training readiness, training status or race predictions. VO2 max, training effect and recovery time *are* available: Garmin's watches write them into each activity file, and `garmin_get_performance_metrics` decodes them. VO2 max and training effect match Garmin Connect; recovery time and performance condition come from undocumented fields and are approximate.
 - **Your account only.** The key only reads the account that created it.
 
 ## Security

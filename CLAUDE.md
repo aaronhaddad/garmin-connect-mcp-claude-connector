@@ -18,10 +18,10 @@ Gotchas on this machine: Node lives in nvm (`~/.nvm/versions/node/v24.16.0/bin`)
 
 - `src/index.ts`: CLI router (`serve` default, `setup`, `status`, `logout`)
 - `src/server.ts`: `createServer()` factory; resolves the key lazily so a key added by setup works without restart
-- `src/tools.ts`: all 22 tools. Every tool has `title`, `description` and annotations (directory requirement)
+- `src/tools.ts`: all 23 tools. Every tool has `title`, `description` and annotations (directory requirement)
 - `src/api.ts`: `GarminClient`, endpoint paths, range chunking (`RANGE_ENDPOINTS.maxDays`), relative-date parsing, actionable HTTP error messages
 - `src/auth.ts`: key → token exchange, memory + disk cache (0600), single in-flight refresh, retry once on 401
-- `src/fit.ts`: unzip Garmin's download, decode with `@garmin/fitsdk`, interpolated distance splits with pause removal, pacing verdict
+- `src/fit.ts`: unzip Garmin's download, decode with `@garmin/fitsdk` (with `includeUnknownData`), interpolated distance splits with pause removal, pacing verdict, and `performanceMetrics()` for Garmin's undocumented messages 79/140 (VO2 max, training effect, recovery)
 - `src/format.ts`: activity summaries, null-stripping, downsampling to stay under the 25k character limit
 - `src/keystore.ts`: key lookup order `$GARMIN_PERSONAL_API_KEY` → macOS Keychain (`security -i`, never on argv) → `~/.config/garmin/connect-personal-api-key` (shared with Garmin's Python client)
 - `src/cli/`: clack wizard, client registration (Claude Desktop / Claude Code / Cursor), status/logout
@@ -33,7 +33,7 @@ Endpoint paths come from Garmin's Apache-2.0 client, github.com/garmin/connect-p
 ## Constraints
 
 - **Read-only.** No write endpoints exist; don't add any.
-- **No derived metrics** such as VO2 max, training readiness or recovery time. Garmin doesn't expose them.
+- **Derived metrics only from FIT files.** The API has no endpoints for them (`/metrics-service/*` returns 404), but watches write some into each activity file: msg 79 field 17 = VO2 max before the activity, msg 140 field 7 = after, field 27 > 0 = new reading, 4/20 = training effect ×10, 9 = recovery minutes, 17 = performance condition. VO2 max = raw × 3.5 / 65536. VO2 max and training effect were verified against Garmin Connect (2026-10-24); recovery and performance condition are not. Training readiness, training status and race predictions are server-side only; don't add login scraping to get them
 - **Personal use only.** Garmin's FAQ says the Personal API is not for commercial multi-user apps. Never build a hosted/multi-tenant version; distribution is "each user runs it locally with their own key".
 - **stdout is the MCP protocol** in serve mode. Log only to stderr.
 - **Never log, print or put the key on a command line.** Use `maskKey()` for display.
@@ -42,7 +42,7 @@ Endpoint paths come from Garmin's Apache-2.0 client, github.com/garmin/connect-p
 
 - Built, unit tested and smoke tested. Repo: github.com/aaronhaddad/garmin-connect-mcp-claude-connector (private). npm package name stays `garmin-personal-api-mcp`
 - MCPB prep (steps 2–8 below) done and the packed bundle runs; not yet installed in Claude Desktop
-- **Not yet verified against a real key.** First thing to do: `npm run setup` with a real key, then `node dist/index.js status`, then ask "how was my last run?" in Claude. `summarizeActivity()` in `src/format.ts` assumes Garmin Connect's usual field names (`activityId`, `distance`, `duration`, `averageSpeed`, `averageHR`…). Adjust them if the real responses differ.
+- **Verified against a real key** (2026-10-24): setup, activity list, FIT splits and the performance-metrics tool all work on real data, and the list's field names match `summarizeActivity()`
 - npm name `garmin-connect-mcp` is taken, hence `garmin-personal-api-mcp`
 
 ## Next: Claude Connectors Directory as a desktop extension (.mcpb)

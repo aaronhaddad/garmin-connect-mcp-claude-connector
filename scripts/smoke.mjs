@@ -62,7 +62,7 @@ await client.connect(new StdioClientTransport({
 
 const { tools } = await client.listTools();
 const names = tools.map((t) => t.name);
-for (const t of ["garmin_list_activities", "garmin_get_activity_splits", "garmin_get_day", "garmin_get_steps", "garmin_api_get"]) assert.ok(names.includes(t), `missing ${t}`);
+for (const t of ["garmin_list_activities", "garmin_get_activity_splits", "garmin_get_performance_metrics", "garmin_get_day", "garmin_get_steps", "garmin_api_get"]) assert.ok(names.includes(t), `missing ${t}`);
 assert.ok(tools.every((t) => t.annotations && t.description), "every tool needs a description and annotations");
 
 const text = (r) => r.content.map((c) => c.text).join("\n");
@@ -75,6 +75,10 @@ const splits = await client.callTool({ name: "garmin_get_activity_splits", argum
 assert.ok(!splits.isError, text(splits));
 assert.match(text(splits), /\| 1 \| 1\.00 \| 5:33 \| 5:33\/km/);
 assert.match(text(splits), /too fast/);
+
+const perf = await client.callTool({ name: "garmin_get_performance_metrics", arguments: { last_n: 1 } });
+assert.ok(!perf.isError, text(perf));
+assert.match(text(perf), /VO2 max: not available[\s\S]*Prenzlauer Berg Run/, "a FIT without Garmin's physiology messages still lists the activity");
 
 const steps = await client.callTool({ name: "garmin_get_steps", arguments: { start_date: "2026-08-01", end_date: "2026-09-15" } });
 assert.ok(!steps.isError, text(steps));

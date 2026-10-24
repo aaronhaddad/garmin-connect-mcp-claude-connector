@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analysePacing, extractFit, fmtDuration, fmtPace, summarizeFit } from "../src/fit.js";
+import { analysePacing, extractFit, fmtDuration, fmtPace, performanceMetrics, summarizeFit } from "../src/fit.js";
 import { makeRunFit, zipFit } from "./fixtures.js";
 
 describe("summarizeFit", () => {
@@ -54,5 +54,44 @@ describe("formatters", () => {
     expect(fmtPace(359.6)).toBe("6:00/km");
     expect(fmtDuration(2033)).toBe("33:53");
     expect(fmtDuration(7199)).toBe("1:59:59");
+  });
+});
+
+describe("performanceMetrics", () => {
+  // Raw values from real Garmin files, checked against Garmin Connect's VO2 max chart (45.80 → "46").
+  const run = {
+    sessionMesgs: [{ sport: "running", startTime: new Date("2026-10-21T18:30:40Z") }],
+    "140": [{ 4: 42, 7: 857676, 9: 2475, 17: -3, 20: 11, 27: 857676 }],
+    "79": [{ 17: 858525 }],
+  };
+
+  it("decodes VO2 max before and after, and flags a new reading", () => {
+    const m = performanceMetrics(run);
+    expect(m.vo2max_before).toBe(45.85);
+    expect(m.vo2max_after).toBe(45.8);
+    expect(m.new_vo2max_reading).toBe(true);
+    expect(m.recovery_time_h).toBe(41.3);
+    expect(m.training_effect_aerobic).toBe(4.2);
+    expect(m.training_effect_anaerobic).toBe(1.1);
+    expect(m.performance_condition).toBe(-3);
+  });
+
+  it("prefers the session's documented training effect over message 140", () => {
+    const m = performanceMetrics({ ...run, sessionMesgs: [{ sport: "running", totalTrainingEffect: 3.9, totalAnaerobicTrainingEffect: 0.4 }] });
+    expect(m.training_effect_aerobic).toBe(3.9);
+    expect(m.training_effect_anaerobic).toBe(0.4);
+  });
+
+  it("reports no reading for a gym session and hides fields Garmin leaves at zero", () => {
+    const m = performanceMetrics({ sessionMesgs: [{ sport: "training" }], "140": [{ 4: 7, 7: 0, 9: 0, 17: 0, 20: 0, 27: 0 }], "79": [{ 17: 858525 }] });
+    expect(m.new_vo2max_reading).toBe(false);
+    expect(m.vo2max_after).toBeUndefined();
+    expect(m.vo2max_before).toBe(45.85);
+    expect(m.recovery_time_h).toBeUndefined();
+    expect(m.performance_condition).toBeUndefined();
+  });
+
+  it("copes with a file that has neither message", () => {
+    expect(performanceMetrics({ sessionMesgs: [{ sport: "cycling" }] })).toMatchObject({ sport: "cycling", new_vo2max_reading: false });
   });
 });

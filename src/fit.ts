@@ -93,7 +93,8 @@ const time = (v: unknown) => (v instanceof Date ? v.getTime() : undefined);
 export function decodeFit(fit: Uint8Array): Record<string, Mesg[]> {
   const stream = Stream.fromArrayBuffer(fit.slice().buffer);
   if (!Decoder.isFIT(stream)) throw new Error("The file is not a FIT file.");
-  const { messages, errors } = new Decoder(stream).read({ convertDateTimesToDates: true, expandSubFields: true, expandComponents: true, mergeHeartRates: true });
+  // includeUnknownData keeps Garmin's undocumented messages (e.g. 140, 79), keyed by message number.
+  const { messages, errors } = new Decoder(stream).read({ convertDateTimesToDates: true, expandSubFields: true, expandComponents: true, mergeHeartRates: true, includeUnknownData: true });
   if (errors.length && !messages.recordMesgs?.length) {
     throw new Error(`Could not decode the FIT file: ${String(errors[0])}`);
   }
@@ -152,6 +153,56 @@ export function summarizeFit(fit: Uint8Array, splitMeters = 1000): FitSummary {
   };
 
   return { session, splits, laps, pacing: analysePacing(splits), paused_s: round(pausedS, 1), record_count: records.length };
+}
+
+/**
+ * Garmin's own per-activity physiology, from two undocumented FIT messages its watches write:
+ *   79 "user metrics": field 17 = VO2 max going into the activity
+ *   140 "physiological metrics": 7 = VO2 max after it, 27 > 0 only when the activity produced a new
+ *     VO2 max reading, 4/20 = aerobic/anaerobic training effect x10, 9 = recovery time (min),
+ *     17 = performance condition
+ * VO2 max is stored as METs x 65536; x 3.5 gives ml/kg/min. VO2 max and training effect were checked
+ * against Garmin Connect; recovery time and performance condition follow community decoders and are unverified.
+ */
+export interface PerformanceMetrics {
+  sport?: string;
+  sub_sport?: string;
+  start_time?: string;
+  vo2max_before?: number;
+  vo2max_after?: number;
+  /** True when Garmin computed a VO2 max from this activity (a dot on its VO2 max chart). */
+  new_vo2max_reading: boolean;
+  recovery_time_h?: number;
+  training_effect_aerobic?: number;
+  training_effect_anaerobic?: number;
+  performance_condition?: number;
+}
+
+const vo2 = (raw: unknown) => {
+  const v = num(raw);
+  return v ? round((v * 3.5) / 65536, 2) : undefined;
+};
+
+export function performanceMetrics(m: Record<string, Mesg[]>): PerformanceMetrics {
+  const s = (m.sessionMesgs ?? [])[0];
+  const p = (m["140"] ?? [])[0] ?? {};
+  const u = (m["79"] ?? [])[0] ?? {};
+  const sport = typeof s?.sport === "string" ? s.sport : undefined;
+  const tenths = (v: unknown) => (num(v) === undefined ? undefined : round(num(v)! / 10, 1));
+  const recovery = num(p[9]);
+  return {
+    sport,
+    sub_sport: typeof s?.subSport === "string" ? s.subSport : undefined,
+    start_time: s?.startTime instanceof Date ? s.startTime.toISOString() : undefined,
+    vo2max_before: vo2(u[17]),
+    vo2max_after: vo2(p[7]),
+    new_vo2max_reading: (num(p[27]) ?? 0) > 0,
+    recovery_time_h: recovery ? round(recovery / 60, 1) : undefined,
+    training_effect_aerobic: num(s?.totalTrainingEffect) ?? tenths(p[4]),
+    training_effect_anaerobic: num(s?.totalAnaerobicTrainingEffect) ?? tenths(p[20]),
+    // Garmin only shows performance condition on runs; 0 elsewhere means "not measured".
+    performance_condition: sport === "running" ? num(p[17]) : undefined,
+  };
 }
 
 const mul = (v: number | undefined, k: number) => (v === undefined ? undefined : v * k);

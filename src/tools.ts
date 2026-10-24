@@ -12,7 +12,7 @@ import {
   resolveDate,
   resolveRange,
 } from "./api.js";
-import { extractFit, fmtDuration, fmtPace, summarizeFit } from "./fit.js";
+import { decodeFit, extractFit, fmtDuration, fmtPace, type PerformanceMetrics, performanceMetrics, summarizeFit } from "./fit.js";
 import { activityLine, isObj, jsonResult, summarizeActivity, textResult } from "./format.js";
 
 const READ_ONLY = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true } as const;
@@ -185,6 +185,88 @@ Use this for "how was my pacing", "did I go out too fast", "compare km 1 to km 5
   );
 
   server.registerTool(
+    "garmin_get_performance_metrics",
+    {
+      title: "VO2 max, training effect & recovery",
+      description: `Garmin's own VO2 max, read the way Garmin Connect shows it, plus per-activity aerobic/anaerobic training effect, recovery time and performance condition. Decoded from the original .FIT files, since the Personal API has no VO2 max endpoint.
+
+Returns the current VO2 max (whole number, as Garmin's apps round it, plus the precise value), every new VO2 max reading in the window (Garmin only updates it on qualifying runs and power-meter rides), and a row per activity.
+
+Examples:
+  - "what's my VO2 max?" / "how is my VO2 max trending?" -> last_n=20
+  - "how hard was today's workout, how long to recover?" -> last_n=1
+Each activity costs one file download, so keep last_n small unless a trend is asked for.`,
+      inputSchema: z.strictObject({
+        activity_id: ActivityId.optional().describe("One activity, from garmin_list_activities. Omit to scan recent activities"),
+        last_n: z.number().int().min(1).max(30).default(10).describe("How many recent activities to scan (all types)"),
+        activity_type: z.string().optional().describe("Only this Garmin type key, e.g. running, cycling"),
+        response_format: Format,
+      }),
+      annotations: READ_ONLY,
+    },
+    async ({ activity_id, last_n, activity_type, response_format }, ctx) => {
+      const signal = ctx.mcpReq.signal;
+      const targets: { id: string; name?: string; type?: string; start?: string }[] = [];
+      if (activity_id) {
+        const a = summarizeActivity(await client.activity(activity_id, signal));
+        targets.push({ id: activity_id, name: a?.name, type: a?.type, start: a?.start_local });
+      } else {
+        const raw = await client.searchActivities({ limit: last_n, activityType: activity_type }, signal);
+        const list = Array.isArray(raw) ? raw : isObj(raw) && Array.isArray(raw.activityList) ? raw.activityList : [];
+        for (const a of list.map(summarizeActivity)) if (a) targets.push({ id: String(a.activity_id), name: a.name, type: a.type, start: a.start_local });
+      }
+      const rows = await mapLimit(targets, 3, async (t) => {
+        try {
+          return { ...t, m: performanceMetrics(decodeFit(extractFit(await client.downloadActivity(t.id, signal)))) };
+        } catch (e) {
+          return { ...t, skipped: (e as Error).message };
+        }
+      });
+      const ok = rows.filter((r): r is typeof r & { m: PerformanceMetrics } => "m" in r && !!r.m);
+      const readings = ok.filter((r) => r.m.new_vo2max_reading && r.m.vo2max_after);
+      const newest = ok[0];
+      const current = newest?.m.new_vo2max_reading ? newest.m.vo2max_after : (newest?.m.vo2max_before ?? readings[0]?.m.vo2max_after);
+      const result = {
+        vo2max: current === undefined ? undefined : { value: Math.round(current), precise: current, as_of: newest?.start?.slice(0, 10), last_reading: readings[0]?.start?.slice(0, 10) },
+        vo2max_readings: readings.map((r) => ({
+          date: r.start?.slice(0, 10),
+          activity_id: r.id,
+          type: r.type,
+          vo2max: Math.round(r.m.vo2max_after!),
+          precise: r.m.vo2max_after,
+          change: r.m.vo2max_before !== undefined ? Math.round((r.m.vo2max_after! - r.m.vo2max_before) * 100) / 100 : undefined,
+        })),
+        activities: ok.map((r) => ({ date: r.start, activity_id: r.id, name: r.name, type: r.type, ...r.m })),
+        skipped: rows.filter((r) => "skipped" in r).map((r) => ({ activity_id: r.id, type: r.type, reason: (r as { skipped: string }).skipped })),
+        note: "VO2 max and training effect match Garmin Connect. Recovery time and performance condition come from undocumented FIT fields; treat them as approximate.",
+      };
+      if (response_format === "json") return jsonResult(result as unknown as Json);
+
+      const lines: string[] = [];
+      if (result.vo2max) {
+        const v = result.vo2max;
+        lines.push(`# VO2 max: ${v.value} ml/kg/min`, `Precise ${v.precise.toFixed(2)} as of ${v.as_of}${v.last_reading ? `; last updated by the ${v.last_reading} activity` : "; no new reading in this window"}.`);
+      } else {
+        lines.push("# VO2 max: not available", "None of these activities carry a VO2 max. Garmin needs a qualifying outdoor run (or a ride with a power meter) to estimate one.");
+      }
+      if (result.vo2max_readings.length) {
+        lines.push("", "## VO2 max readings", "| date | activity | VO2 max | change |", "|---|---|---|---|");
+        for (const r of result.vo2max_readings) lines.push(`| ${r.date} | ${r.type ?? "?"} | ${r.vo2max} (${r.precise?.toFixed(2)}) | ${r.change === undefined ? "–" : `${r.change > 0 ? "+" : ""}${r.change.toFixed(2)}`} |`);
+      }
+      if (ok.length) {
+        lines.push("", "## Per activity", "| date | activity | aerobic TE | anaerobic TE | recovery | perf. condition |", "|---|---|---|---|---|---|");
+        for (const r of ok) {
+          const m = r.m;
+          lines.push(`| ${r.start?.slice(0, 16) ?? "?"} | ${r.name ?? r.type ?? r.id} | ${m.training_effect_aerobic ?? "–"} | ${m.training_effect_anaerobic ?? "–"} | ${m.recovery_time_h !== undefined ? `${m.recovery_time_h} h` : "–"} | ${m.performance_condition !== undefined ? `${m.performance_condition > 0 ? "+" : ""}${m.performance_condition}` : "–"} |`);
+        }
+      }
+      if (result.skipped.length) lines.push("", `Skipped ${result.skipped.length} without a FIT file (e.g. manual entries): ${result.skipped.map((s) => s.type ?? s.activity_id).join(", ")}.`);
+      lines.push("", `_${result.note}_`);
+      return textResult(lines.join("\n"));
+    },
+  );
+
+  server.registerTool(
     "garmin_download_activity_fit",
     {
       title: "Save original activity file",
@@ -313,4 +395,18 @@ Example: path="/activity-service/activity/123456/workouts"`,
       return jsonResult(await client.get(path, params, ctx.mcpReq.signal));
     },
   );
+}
+
+/** Runs `fn` over `items` with at most `limit` in flight, keeping input order. */
+async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await fn(items[i]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return out;
 }

@@ -4,7 +4,7 @@
   "name": "garmin-personal-api-mcp",
   "display_name": "Personal Data for Garmin Connect",
   "version": "0.1.0",
-  "description": "Read-only access to your own Garmin Connect activities, sleep, HRV, Body Battery and weight, via Garmin's official Personal API.",
+  "description": "Read-only access to your own Garmin Connect activities, VO2 max, sleep, HRV, Body Battery and weight, via Garmin's official Personal API.",
   "long_description": "Ask Claude about your training and recovery using your own Garmin Connect data. Activities come with exact per-km splits computed from the original .FIT file, plus sleep, HRV, Body Battery, stress, steps, weight and nutrition.\n\nEverything runs on your computer: the extension exchanges your Personal API key for a 24-hour token with Garmin and makes read-only GET requests. No data passes through any third-party server.\n\nYou need a Garmin Connect account and a Personal API key: Garmin Connect → Settings → Personal API → Create Key (https://connect.garmin.com/app/settings/personalApiToken).\n\nThis is an independent project, not made or endorsed by Garmin. \"Garmin\" and \"Garmin Connect\" are trademarks of Garmin Ltd.",
   "author": {
     "name": "Haroun (Aaron) Haddad",
@@ -23,7 +23,9 @@
     "entry_point": "dist/index.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/dist/index.js"],
+      "args": [
+        "${__dirname}/dist/index.js"
+      ],
       "env": {
         "GARMIN_PERSONAL_API_KEY": "${user_config.api_key}",
         "GARMIN_MCP_RUNTIME": "mcpb"
@@ -40,36 +42,118 @@
     }
   },
   "tools": [
-    { "name": "garmin_get_profile", "description": "Your Garmin profile settings (units, weight, height, birth year, lactate threshold where set) plus heart-rate zones." },
-    { "name": "garmin_list_activities", "description": "List recorded activities (runs, gym sessions, rides…), newest first, with distance, time, pace and heart rate." },
-    { "name": "garmin_get_activity", "description": "Garmin's computed summary for one activity: distance, durations, pace/speed, HR, cadence, elevation, training effect, calories." },
-    { "name": "garmin_get_activity_splits", "description": "Exact distance splits from the original .FIT file (interpolated, pauses excluded), per-split HR, cadence and climb, device laps, and a pacing verdict." },
-    { "name": "garmin_download_activity_fit", "description": "Save an activity's original file to a folder on this computer, for Runalyze, Golden Cheetah and similar tools." },
-    { "name": "garmin_get_day", "description": "One day in one call: daily summary, sleep, overnight HRV, Body Battery and activities." },
-    { "name": "garmin_get_daily_summaries", "description": "Per-day totals: steps, calories, resting/min/max heart rate, stress, intensity minutes, floors, Body Battery high/low." },
-    { "name": "garmin_get_sleep", "description": "Per-night sleep: duration, deep/light/REM/awake time, sleep score and timing." },
-    { "name": "garmin_get_hrv", "description": "Per-night heart-rate variability: last-night average, weekly average, baseline range and status." },
-    { "name": "garmin_get_body_battery", "description": "Per-day Body Battery: charged, drained, highest and lowest values." },
-    { "name": "garmin_get_stress", "description": "Per-day all-day stress levels." },
-    { "name": "garmin_get_steps", "description": "Per-day step totals and goals." },
-    { "name": "garmin_get_hydration", "description": "Per-day logged water intake and goal." },
-    { "name": "garmin_get_weight", "description": "Every weigh-in in a range, with BMI, body fat, muscle mass and water where a smart scale recorded them." },
-    { "name": "garmin_get_weight_goals", "description": "Weight goals in effect during a range." },
-    { "name": "garmin_get_wellness_activities", "description": "Wellness activity summaries (e.g. breathwork and relaxation sessions) for a range." },
-    { "name": "garmin_get_sleep_detail", "description": "One night's sleep in full: stages timeline, score breakdown, respiration, restless moments, SpO2 and HR." },
-    { "name": "garmin_get_heart_rate", "description": "One day's resting HR and all-day heart-rate samples." },
-    { "name": "garmin_get_spo2", "description": "One day's SpO2 readings and acclimation." },
-    { "name": "garmin_get_fitness_age", "description": "Garmin's fitness age estimate and its inputs for a date." },
-    { "name": "garmin_get_nutrition", "description": "Foods and macros logged in Garmin Connect's nutrition log for one day." },
-    { "name": "garmin_api_get", "description": "Read-only GET to any other documented Personal API endpoint (e.g. menstrual cycle summaries, activity workouts)." }
+    {
+      "name": "garmin_get_profile",
+      "description": "Your Garmin profile settings (units, weight, height, birth year, lactate threshold where set) plus heart-rate zones."
+    },
+    {
+      "name": "garmin_list_activities",
+      "description": "List recorded activities (runs, gym sessions, rides…), newest first, with distance, time, pace and heart rate."
+    },
+    {
+      "name": "garmin_get_activity",
+      "description": "Garmin's computed summary for one activity: distance, durations, pace/speed, HR, cadence, elevation, training effect, calories."
+    },
+    {
+      "name": "garmin_get_activity_splits",
+      "description": "Exact distance splits from the original .FIT file (interpolated, pauses excluded), per-split HR, cadence and climb, device laps, and a pacing verdict."
+    },
+    {
+      "name": "garmin_get_performance_metrics",
+      "description": "Your VO2 max as Garmin Connect shows it, its readings over time, plus per-activity training effect and recovery time, decoded from the activity files."
+    },
+    {
+      "name": "garmin_download_activity_fit",
+      "description": "Save an activity's original file to a folder on this computer, for Runalyze, Golden Cheetah and similar tools."
+    },
+    {
+      "name": "garmin_get_day",
+      "description": "One day in one call: daily summary, sleep, overnight HRV, Body Battery and activities."
+    },
+    {
+      "name": "garmin_get_daily_summaries",
+      "description": "Per-day totals: steps, calories, resting/min/max heart rate, stress, intensity minutes, floors, Body Battery high/low."
+    },
+    {
+      "name": "garmin_get_sleep",
+      "description": "Per-night sleep: duration, deep/light/REM/awake time, sleep score and timing."
+    },
+    {
+      "name": "garmin_get_hrv",
+      "description": "Per-night heart-rate variability: last-night average, weekly average, baseline range and status."
+    },
+    {
+      "name": "garmin_get_body_battery",
+      "description": "Per-day Body Battery: charged, drained, highest and lowest values."
+    },
+    {
+      "name": "garmin_get_stress",
+      "description": "Per-day all-day stress levels."
+    },
+    {
+      "name": "garmin_get_steps",
+      "description": "Per-day step totals and goals."
+    },
+    {
+      "name": "garmin_get_hydration",
+      "description": "Per-day logged water intake and goal."
+    },
+    {
+      "name": "garmin_get_weight",
+      "description": "Every weigh-in in a range, with BMI, body fat, muscle mass and water where a smart scale recorded them."
+    },
+    {
+      "name": "garmin_get_weight_goals",
+      "description": "Weight goals in effect during a range."
+    },
+    {
+      "name": "garmin_get_wellness_activities",
+      "description": "Wellness activity summaries (e.g. breathwork and relaxation sessions) for a range."
+    },
+    {
+      "name": "garmin_get_sleep_detail",
+      "description": "One night's sleep in full: stages timeline, score breakdown, respiration, restless moments, SpO2 and HR."
+    },
+    {
+      "name": "garmin_get_heart_rate",
+      "description": "One day's resting HR and all-day heart-rate samples."
+    },
+    {
+      "name": "garmin_get_spo2",
+      "description": "One day's SpO2 readings and acclimation."
+    },
+    {
+      "name": "garmin_get_fitness_age",
+      "description": "Garmin's fitness age estimate and its inputs for a date."
+    },
+    {
+      "name": "garmin_get_nutrition",
+      "description": "Foods and macros logged in Garmin Connect's nutrition log for one day."
+    },
+    {
+      "name": "garmin_api_get",
+      "description": "Read-only GET to any other documented Personal API endpoint (e.g. menstrual cycle summaries, activity workouts)."
+    }
   ],
-  "keywords": ["garmin", "garmin-connect", "running", "fitness", "sleep", "hrv", "health", "fit"],
+  "keywords": [
+    "garmin",
+    "garmin-connect",
+    "running",
+    "fitness",
+    "sleep",
+    "hrv",
+    "health",
+    "fit"
+  ],
   "license": "MIT",
   "privacy_policies": [
     "https://github.com/aaronhaddad/garmin-connect-mcp-claude-connector/blob/main/PRIVACY.md"
   ],
   "compatibility": {
-    "platforms": ["darwin", "win32"],
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
     "runtimes": {
       "node": ">=20.3.0"
     }
