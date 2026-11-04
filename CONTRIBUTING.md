@@ -50,7 +50,7 @@ To test the extension, double-click the `.mcpb` you packed, then add your key in
 | `plugin/`, `.claude-plugin/marketplace.json` | The Claude plugin for Claude Code and Cowork: manifest, `.mcp.json` (runs the npm package, pinned) and the `garmin-training-insights` skill |
 | `scripts/smoke.mjs` | The end-to-end smoke test and its fake Garmin API |
 
-[CLAUDE.md](CLAUDE.md) has more detail on conventions.
+[AGENTS.md](AGENTS.md) has more detail on conventions.
 
 ## Common changes
 
@@ -77,7 +77,7 @@ Messages the user or model sees must tell them how to fix the key using `keyFixH
 
 ### Metrics from FIT files
 
-VO2 max, training effect and recovery time come from undocumented messages in Garmin's activity files; the field map is in `src/fit.ts` and CLAUDE.md. If you decode a new field, **check its values against what Garmin Connect shows** for a few real activities before claiming it's accurate, and say in the PR which activities you checked. Anything unverified must be labelled approximate in the tool output.
+VO2 max, training effect and recovery time come from undocumented messages in Garmin's activity files; the field map is in `src/fit.ts` and AGENTS.md. If you decode a new field, **check its values against what Garmin Connect shows** for a few real activities before claiming it's accurate, and say in the PR which activities you checked. Anything unverified must be labelled approximate in the tool output.
 
 ## Pull requests
 
