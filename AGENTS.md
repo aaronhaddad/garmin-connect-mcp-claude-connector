@@ -1,5 +1,9 @@
 # garmin-personal-api-mcp
 
+## Agent instructions
+
+These instructions apply to any coding agent working in this repository. Product names, client-specific commands and paths below describe the actual integrations; preserve them when editing this file.
+
 MCP server for a user's own Garmin Connect data via Garmin's official **Personal API** (read-only, GET only, key → 24 h bearer token). TypeScript, MCP TypeScript SDK **v2** (`@modelcontextprotocol/server`, Zod 4), stdio transport.
 
 ## Commands
@@ -13,7 +17,7 @@ MCP server for a user's own Garmin Connect data via Garmin's official **Personal
 
 Run `npm run check` after every change.
 
-Gotchas on this machine: Node lives in nvm (`~/.nvm/versions/node/v24.16.0/bin`), which non-interactive shells don't load, so prepend it to PATH. The global `~/.npmrc` sets `legacy-peer-deps=true`; `vite` is pinned in devDependencies so vitest still installs correctly.
+Gotchas on this machine: Node is managed by nvm, which non-interactive shells do not load. Source `~/.nvm/nvm.sh`, then run `nvm use --lts` before npm commands. The global `~/.npmrc` sets `legacy-peer-deps=true`; `vite` is pinned in devDependencies so vitest still installs correctly.
 
 ## Layout
 
